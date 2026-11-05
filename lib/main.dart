@@ -186,7 +186,10 @@ class _ShellState extends State<Shell> {
   Widget build(BuildContext context) {
     final pages = [HomePage(onTab: (i) => setState(() => tab = i)), const PaymentsPage(), const SmsPage()];
     return Scaffold(
-      body: SafeArea(bottom: false, child: pages[tab]),
+      body: SafeArea(
+        bottom: false,
+        child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 640), child: pages[tab])),
+      ),
       floatingActionButton: tab == 2
           ? null
           : FloatingActionButton.extended(
