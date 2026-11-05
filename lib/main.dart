@@ -17,10 +17,16 @@ final store = Store();
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (!kIsWeb) {
+    try {
+      await Notifier.init();
+    } catch (_) {/* bildirim izni yoksa uygulama yine açılsın */}
+  }
   try {
-    await Notifier.init();
-  } catch (_) {/* bildirim izni yoksa uygulama yine açılsın */}
-  await store.load();
+    await store.load();
+  } catch (e) {
+    debugPrint('Kayıtlar yüklenemedi: $e');
+  }
   runApp(const SonGunApp());
 }
 
