@@ -47,7 +47,7 @@ jobs:
       - name: Paketleri indir ve simgeleri üret
         run: |
           flutter pub get
-          dart run flutter_launcher_icons
+          dart run flutter_launcher_icons -f tool/icons_android.yaml
 
       - name: Testler
         run: flutter test
@@ -93,7 +93,7 @@ jobs:
           rm -f test/widget_test.dart
           python3 tool/patch_web.py
           flutter pub get
-          dart run flutter_launcher_icons
+          dart run flutter_launcher_icons -f tool/icons_web.yaml
           flutter build web --release --base-href /son-gun/
           cp -r site/yasal build/web/yasal
 
@@ -139,5 +139,5 @@ jobs:
           rm -f test/widget_test.dart
           python3 tool/patch_ios.py
           flutter pub get
-          dart run flutter_launcher_icons
+          dart run flutter_launcher_icons -f tool/icons_ios.yaml
           flutter build ios --release --no-codesign --build-number=${{ github.run_number }}
