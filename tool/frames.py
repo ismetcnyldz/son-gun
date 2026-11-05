@@ -8,7 +8,7 @@ FRAMES = [
   ('dark-editor',    'teal',  'FOTOĞRAFTAN OKUMA',  'Fotoğrafını çek,<br>tarihi biz okuyalım.'),
   ('light-payments', 'light', 'KART VE ABONELİK',   'Bütün ödemelerin<br>tek bakışta.'),
   ('dark-sms',       'teal',  'SMS KONTROLÜ',       'Sahte mesajı<br>tıklamadan yakala.'),
-  ('light-turkey',   'light', 'TÜRKİYE TAKVİMİ',    'Muayene, MTV, vergi:<br>tarihleri biz hesaplayalım.'),
+  ('light-turkey',   'light', 'TÜRKİYE TAKVİMİ',    'Muayene ve vergi<br>tarihleri hazır.'),
   ('dark-home',      'teal',  'KOYU TEMA',          'Gece de gündüz de<br>göz yormaz.'),
 ]
 FONTS = '<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Manrope:wght@600;800&display=block" rel="stylesheet">'
