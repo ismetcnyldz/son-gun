@@ -3,6 +3,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import 'entitlement.dart';
 import 'models.dart';
 
 class Notifier {
@@ -23,18 +24,35 @@ class Notifier {
     tzdata.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
     await _plugin.initialize(
-      const InitializationSettings(android: AndroidInitializationSettings('@mipmap/ic_launcher')),
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        iOS: DarwinInitializationSettings(
+          requestAlertPermission: false,
+          requestBadgePermission: false,
+          requestSoundPermission: false,
+        ),
+      ),
     );
-    await _plugin
+    _ready = true;
+  }
+
+  /// Bildirim izni iste (hoş geldin ekranında ve sonraki açılışlarda)
+  static Future<bool> requestPermission() async {
+    if (!_ready) return false;
+    final android = await _plugin
         .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
         ?.requestNotificationsPermission();
-    _ready = true;
+    final ios = await _plugin
+        .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>()
+        ?.requestPermissions(alert: true, badge: true, sound: true);
+    return (android ?? false) || (ios ?? false);
   }
 
   /// Tüm bildirimleri silip baştan kurar (kayıt sayısı az olduğu için en güvenli yol).
   static Future<void> rescheduleAll(List<Item> items) async {
     if (!_ready) return;
     await _plugin.cancelAll();
+    if (!entitlement.active) return; // deneme / abonelik bitince hatırlatma yok
     final now = tz.TZDateTime.now(tz.local);
     var id = 1;
     for (final it in items) {

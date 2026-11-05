@@ -4,6 +4,10 @@ import 'dart:convert';
 /// Uygulamanın görünen adı. İsim değişirse sadece burası ve AndroidManifest değişir.
 const String appName = 'Son Gün';
 
+/// Destek e-postası (alan adı alınınca güncellenecek)
+const String supportEmail = 'destek@songun.app';
+const String appVersion = '0.3.0';
+
 enum Kind { belge, garanti, kart, abonelik, diger }
 
 extension KindText on Kind {

@@ -11,10 +11,13 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'entitlement.dart';
 import 'lock.dart';
 import 'models.dart';
 import 'notify.dart';
+import 'onboarding.dart';
 import 'ocr.dart';
+import 'paywall.dart';
 import 'settings_page.dart';
 import 'sms.dart';
 import 'store.dart';
@@ -59,6 +62,8 @@ Future<void> _start() async {
   try {
     await loadThemeMode();
     await loadLockSetting();
+    await entitlement.load();
+    if (!kIsWeb && entitlement.onboarded) await Notifier.requestPermission();
   } catch (_) {}
   try {
     await store.load();
@@ -211,7 +216,10 @@ class _SonGunAppState extends State<SonGunApp> with WidgetsBindingObserver {
           ),
         ),
       ),
-      home: LockGate(child: Shell()),
+      home: ListenableBuilder(
+        listenable: entitlement,
+        builder: (_, __) => entitlement.onboarded ? LockGate(child: Shell()) : OnboardingPage(),
+      ),
     );
   }
 }
@@ -259,6 +267,10 @@ String todayText() {
 }
 
 Future<void> openEditor(BuildContext context, {Item? item, Kind? kind}) async {
+  if (item == null && !entitlement.active) {
+    final ok = await Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => PaywallPage()));
+    if (ok != true || !context.mounted) return;
+  }
   await Navigator.of(context).push(MaterialPageRoute(builder: (_) => EditorPage(item: item, initialKind: kind)));
 }
 
@@ -418,7 +430,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: store,
+      listenable: Listenable.merge([store, entitlement]),
       builder: (context, _) {
         final all = store.upcoming();
         final list = filter == null ? all : all.where((e) => e.kind == filter).toList();
@@ -432,6 +444,7 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.only(bottom: 110),
           children: [
             PageHeader(title: appName, sub: todayText()),
+            if (!entitlement.subscribed) Padding(padding: EdgeInsets.fromLTRB(16, 0, 16, 10), child: TrialBanner()),
             Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: _hero(soon, week)),
             SizedBox(height: 10),
             Padding(
@@ -616,6 +629,39 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Deneme / abonelik durumu şeridi
+class TrialBanner extends StatelessWidget {
+  TrialBanner({super.key});
+  @override
+  Widget build(BuildContext context) {
+    final expired = entitlement.trialStarted && !entitlement.active;
+    final notStarted = !entitlement.trialStarted;
+    final c = expired ? C.red : C.accent;
+    final text = expired
+        ? 'Deneme bitti, hatırlatmalar durdu. Devam etmek için abone ol.'
+        : notStarted
+            ? '${Entitlement.trialDays} gün ücretsiz denemeyi başlat'
+            : 'Ücretsiz deneme: ${entitlement.trialDaysLeft} gün kaldı';
+    return Material(
+      color: c.withValues(alpha: 0.10),
+      borderRadius: BorderRadius.circular(14),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(14),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => PaywallPage())),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(children: [
+            Icon(expired ? Icons.error_outline_rounded : Icons.workspace_premium_rounded, color: c, size: 20),
+            SizedBox(width: 10),
+            Expanded(child: Text(text, style: TextStyle(color: C.ink, fontWeight: FontWeight.w700, fontSize: 13))),
+            Icon(Icons.chevron_right_rounded, color: c),
+          ]),
+        ),
+      ),
     );
   }
 }

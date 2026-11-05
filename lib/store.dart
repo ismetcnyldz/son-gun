@@ -46,6 +46,8 @@ class Store extends ChangeNotifier {
     await _save();
   }
 
+  Future<void> refreshReminders() => Notifier.rescheduleAll(items);
+
   /// Son günü olan kayıtlar, en yakından uzağa
   List<Item> upcoming() {
     final l = items.where((e) => e.nextDue() != null).toList();
