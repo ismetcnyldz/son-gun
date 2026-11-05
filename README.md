@@ -1,4 +1,4 @@
-# Son Gün
+# Dürt
 
 Belgelerin, garantilerin, kart son ödeme günlerinin ve aboneliklerin son tarihlerini saklayıp zamanında hatırlatan Android uygulaması.
 

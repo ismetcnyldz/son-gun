@@ -1,21 +1,23 @@
-# Son Gün: Mağaza metinleri
+# Dürt: Mağaza metinleri
 
 ## Google Play
 
 **Uygulama adı (en fazla 30):**
-Son Gün: Belge ve Ödeme Takibi
+Dürt: Belge ve Ödeme Takibi
 
 **Kısa açıklama (en fazla 80):**
 Sigorta, muayene, garanti ve kart ödemelerinin son gününü unutma.
 
 **Uzun açıklama:**
 
+Son günü sen unut, Dürt unutmaz.
+
 Trafik sigortan ne zaman bitiyor? Araç muayenesi hangi ay? Kartın son ödeme günü yarın mı?
 
-Son Gün, hayatındaki bütün son tarihleri tek yerde toplar ve zamanı gelmeden seni uyarır. Bir daha gecikme faizi, ceza ya da süresi geçmiş garanti yok.
+Dürt, hayatındaki bütün son tarihleri tek yerde toplar ve zamanı gelmeden seni uyarır. Bir daha gecikme faizi, ceza ya da süresi geçmiş garanti yok.
 
 📸 FOTOĞRAFTAN OTOMATİK OKUMA
-Poliçenin, ekstrenin ya da garanti belgesinin fotoğrafını çek. Son Gün tarihi kendisi bulur. Okuma telefonunun içinde yapılır, belgelerin hiçbir yere gönderilmez.
+Poliçenin, ekstrenin ya da garanti belgesinin fotoğrafını çek. Dürt tarihi kendisi bulur. Okuma telefonunun içinde yapılır, belgelerin hiçbir yere gönderilmez.
 
 🔔 ZAMANINDA HATIRLATMA
 Belgeler için 30, 7 ve 1 gün kala; kart ve abonelikler için 3 ve 1 gün kala bildirim alırsın. Son gün sabahı bir kez daha hatırlatılır.
@@ -49,7 +51,7 @@ Trafik sigortası, kasko, DASK, konut ve sağlık sigortası, çek ve senet vade
 ÜCRETLENDİRME
 İlk 30 gün tamamen ücretsiz. Sonrasında aylık ya da yıllık abonelikle devam edebilirsin. Deneme bitmeden iptal edersen hiçbir ücret alınmaz. Abone olmasan da kayıtların silinmez.
 
-Sorun ya da önerin için: destek@songun.app
+Sorun ya da önerin için: destek@durt.app
 
 **Kategori:** Verimlilik (Productivity)
 **Etiketler:** Hatırlatıcı, belge yönetimi, kişisel finans
@@ -58,12 +60,12 @@ Sorun ya da önerin için: destek@songun.app
 
 ## App Store
 
-**Ad (en fazla 30):** Son Gün: Belge ve Ödeme Takibi
+**Ad (en fazla 30):** Dürt: Belge ve Ödeme Takibi
 **Alt başlık (en fazla 30):** Sigorta, garanti, kart takibi
 **Anahtar kelimeler (en fazla 100, virgülle, boşluksuz):**
 sigorta,muayene,garanti,hatırlatıcı,kasko,dask,mtv,ekstre,abonelik,pasaport,ehliyet,fatura,poliçe
 **Tanıtım metni (en fazla 170):**
-Trafik sigortası, muayene, garanti, kart ödemesi… Fotoğrafını çek, tarihi Son Gün okusun, zamanı gelince hatırlatsın. İlk ay ücretsiz.
+Trafik sigortası, muayene, garanti, kart ödemesi… Fotoğrafını çek, tarihi Dürt okusun, zamanı gelince hatırlatsın. İlk ay ücretsiz.
 **Açıklama:** Google Play uzun açıklamasının aynısı.
 **Kategori:** Verimlilik · ikincil: Finans
 **Yaş sınırı:** 4+
@@ -83,7 +85,7 @@ Görseller her derlemede uygulamanın güncel hâlinden otomatik yeniden üretil
 - Gizlilik politikası: https://ismetcnyldz.github.io/son-gun/yasal/gizlilik.html
 - KVKK: https://ismetcnyldz.github.io/son-gun/yasal/kvkk.html
 - Kullanım şartları: https://ismetcnyldz.github.io/son-gun/yasal/sartlar.html
-(Alan adı alınınca songun.app adresine taşınacak. Sayfalardaki [ŞİRKET UNVANI], [ADRES], [İL] alanları dükkân bilgileriyle doldurulacak.)
+(Alan adı alınınca durt.app adresine taşınacak. Sayfalardaki [ŞİRKET UNVANI], [ADRES], [İL] alanları dükkân bilgileriyle doldurulacak.)
 
 ## Mağaza formları için hazır cevaplar
 - **Veri güvenliği (Google) / Gizlilik etiketi (Apple):** Toplanan veri: yalnızca "Satın alımlar" (abonelik durumu, anonim kimlik; uygulama işlevi için, kişiyle ilişkilendirilmez). Konum, kişiler, fotoğraf, finans bilgisi toplanmaz; fotoğraflar cihazda işlenir. İzleme (tracking) yok. Reklam yok.
@@ -91,4 +93,4 @@ Görseller her derlemede uygulamanın güncel hâlinden otomatik yeniden üretil
 - **Hedef kitle:** 18 yaş ve üstü.
 - **Reklam içeriyor mu:** Hayır.
 - **Uygulama erişimi (test için giriş):** Giriş gerekmez.
-- **Abonelik ürünleri (RevenueCat ve mağazada açılacak):** `songun_aylik` (₺49,99/ay), `songun_yillik` (₺399/yıl), yetki adı: `premium`.
+- **Abonelik ürünleri (RevenueCat ve mağazada açılacak):** `durt_aylik` (₺49,99/ay), `durt_yillik` (₺399/yıl), yetki adı: `premium`.
