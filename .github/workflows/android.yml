@@ -83,7 +83,8 @@ jobs:
           (cd /tmp/site && python3 -m http.server 8080 >/dev/null 2>&1 &)
           sleep 2
           python3 tool/screens.py http://localhost:8080/son-gun/ build/web/shots
-          ls build/web/shots
+          python3 tool/frames.py build/web/shots build/web/store
+          ls -R build/web/store
 
       - name: GitHub Pages'e yayınla (gh-pages dalı)
         env:
