@@ -53,6 +53,31 @@ class Store extends ChangeNotifier {
     return l;
   }
 
+  /// Birden çok kayıt ekle (aynı başlık + not + tarih varsa tekrar eklemez)
+  Future<int> addMany(List<Item> list) async {
+    var n = 0;
+    for (final it in list) {
+      final dup = items.any((e) => e.title == it.title && e.note == it.note && e.date == it.date && e.day == it.day);
+      if (!dup) {
+        items.add(it);
+        n++;
+      }
+    }
+    await _save();
+    return n;
+  }
+
+  /// Yedek: bütün kayıtlar tek metin olarak
+  String exportBackup() => 'SONGUN1:${Item.encodeList(items)}';
+
+  /// Yedekten geri yükle. Geçersizse hata fırlatır.
+  Future<int> importBackup(String text) async {
+    var t = text.trim();
+    if (t.startsWith('SONGUN1:')) t = t.substring(8);
+    final list = Item.decodeList(t);
+    return addMany(list);
+  }
+
   double monthlyTotal() => items
       .where((e) => e.kind == Kind.abonelik)
       .fold(0.0, (a, e) => a + (e.amount ?? 0));

@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:son_gun/models.dart';
 import 'package:son_gun/ocr.dart';
 import 'package:son_gun/sms.dart';
+import 'package:son_gun/turkey.dart';
 
 void main() {
   test('trafik sigortası poliçesinden bitiş tarihi okunur', () {
@@ -36,5 +37,22 @@ void main() {
   test('kart son ödeme günü kısa ayda son güne çekilir', () {
     final it = Item(id: '1', kind: Kind.kart, title: 'Kart', day: 31);
     expect(it.nextDue(DateTime(2027, 2, 10)), DateTime(2027, 2, 28));
+  });
+
+  test('muayene: hususi otomobil ilk 3 yıl, sonra 2 yılda bir', () {
+    final now = DateTime(2026, 11, 5);
+    expect(nextInspection(DateTime(2025, 3, 10), now: now), DateTime(2028, 3, 10));
+    expect(nextInspection(DateTime(2020, 6, 1), now: now), DateTime(2027, 6, 1));
+    expect(nextInspection(DateTime(2023, 12, 1), now: now), DateTime(2026, 12, 1));
+  });
+
+  test('ticari araç her yıl', () {
+    expect(nextInspection(DateTime(2024, 1, 20), commercial: true, now: DateTime(2026, 11, 5)), DateTime(2027, 1, 20));
+  });
+
+  test('yenileme bağlantıları', () {
+    expect(renewLinkFor(Item(id: '1', kind: Kind.belge, title: 'Araç muayenesi'))!.url, contains('tuvturk'));
+    expect(renewLinkFor(Item(id: '1', kind: Kind.belge, title: 'Pasaport'))!.url, contains('nvi.gov.tr'));
+    expect(renewLinkFor(Item(id: '1', kind: Kind.belge, title: 'Kasko')), isNull);
   });
 }

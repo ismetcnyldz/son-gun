@@ -9,12 +9,16 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
+import 'lock.dart';
 import 'models.dart';
 import 'notify.dart';
 import 'ocr.dart';
+import 'settings_page.dart';
 import 'sms.dart';
 import 'store.dart';
+import 'turkey.dart';
 
 final store = Store();
 
@@ -54,6 +58,7 @@ Future<void> _start() async {
   }
   try {
     await loadThemeMode();
+    await loadLockSetting();
   } catch (_) {}
   try {
     await store.load();
@@ -206,7 +211,7 @@ class _SonGunAppState extends State<SonGunApp> with WidgetsBindingObserver {
           ),
         ),
       ),
-      home: Shell(),
+      home: LockGate(child: Shell()),
     );
   }
 }
@@ -314,8 +319,20 @@ class PageHeader extends StatelessWidget {
               Text(title, style: display(34)),
             ]),
           ),
-          action ?? ThemeButton(),
+          action ?? SettingsButton(),
         ]),
+      );
+}
+
+/// Ayarlar düğmesi
+class SettingsButton extends StatelessWidget {
+  SettingsButton({super.key});
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: 'Ayarlar',
+        icon: Icon(Icons.settings_rounded, color: C.ink),
+        style: IconButton.styleFrom(backgroundColor: C.card, side: BorderSide(color: C.line)),
+        onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const SettingsPage())),
       );
 }
 
@@ -909,6 +926,11 @@ class _EditorPageState extends State<EditorPage> {
     date = it?.date;
     day = it?.day;
     photo = it?.photo;
+    title.addListener(_onText);
+  }
+
+  void _onText() {
+    if (mounted) setState(() {});
   }
 
   @override
@@ -1101,6 +1123,15 @@ class _EditorPageState extends State<EditorPage> {
                 ),
               ]),
             ),
+            if (renewLinkFor(Item(id: '', kind: kind, title: title.text, note: note.text)) case final link?) ...[
+              SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: () => launchUrl(Uri.parse(link.url), mode: LaunchMode.externalApplication),
+                icon: Icon(Icons.open_in_new_rounded, color: C.accent),
+                style: OutlinedButton.styleFrom(backgroundColor: C.card),
+                label: Text(link.label),
+              ),
+            ],
             SizedBox(height: 20),
             FilledButton(onPressed: scanning ? null : _save, child: Text('Kaydet')),
           ],

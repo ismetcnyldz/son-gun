@@ -59,6 +59,7 @@ perms = [
     "android.permission.POST_NOTIFICATIONS",
     "android.permission.RECEIVE_BOOT_COMPLETED",
     "android.permission.VIBRATE",
+    "android.permission.USE_BIOMETRIC",
 ]
 for p in perms:
     if p not in m:
@@ -79,3 +80,12 @@ if "ScheduledNotificationReceiver" not in m:
     m = m.replace("</application>", receivers + "    </application>", 1)
 mf.write_text(m, encoding="utf-8")
 print("Android ayarları uygulandı.")
+
+# --- Parmak izi kilidi için FlutterFragmentActivity ---
+for f in pathlib.Path("android/app/src/main").rglob("MainActivity.*"):
+    c = f.read_text(encoding="utf-8")
+    c = c.replace("io.flutter.embedding.android.FlutterActivity", "io.flutter.embedding.android.FlutterFragmentActivity")
+    c = re.sub(r"\bFlutterActivity\(\)", "FlutterFragmentActivity()", c)
+    c = re.sub(r"extends FlutterActivity\b", "extends FlutterFragmentActivity", c)
+    f.write_text(c, encoding="utf-8")
+    print("MainActivity güncellendi:", f)
