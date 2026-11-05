@@ -28,6 +28,30 @@ elif groovy.exists():
 else:
     sys.exit("android/app/build.gradle bulunamadı")
 
+# --- R8 (küçültme) kuralları: ML Kit'in kullanmadığımız dil modülleri ---
+(root / "proguard-rules.pro").write_text(
+    "-dontwarn com.google.mlkit.vision.text.chinese.**\n"
+    "-dontwarn com.google.mlkit.vision.text.devanagari.**\n"
+    "-dontwarn com.google.mlkit.vision.text.japanese.**\n"
+    "-dontwarn com.google.mlkit.vision.text.korean.**\n"
+    "-keep class com.dexterous.** { *; }\n",
+    encoding="utf-8",
+)
+if kts.exists():
+    g = kts.read_text(encoding="utf-8")
+    if "proguard-rules.pro" not in g:
+        g = re.sub(r"(buildTypes\s*\{\s*release\s*\{)",
+                   r'\1\n            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")',
+                   g, count=1)
+        kts.write_text(g, encoding="utf-8")
+elif groovy.exists():
+    g = groovy.read_text(encoding="utf-8")
+    if "proguard-rules.pro" not in g:
+        g = re.sub(r"(buildTypes\s*\{\s*release\s*\{)",
+                   r"\1\n            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'",
+                   g, count=1)
+        groovy.write_text(g, encoding="utf-8")
+
 # --- AndroidManifest.xml ---
 mf = root / "src/main/AndroidManifest.xml"
 m = mf.read_text(encoding="utf-8")
