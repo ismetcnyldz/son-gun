@@ -23,7 +23,11 @@ Her ay bir güncelleme hedefi. Sıra ihtiyaca göre değişebilir; yeni fikirler
 - Takvime ekle (Google / Apple takvimi)
 
 ## Ay 3 – Gelir
-- Premium: sınırsız kayıt, gelişmiş okuma, yedekleme (RevenueCat ile)
+- Ücretlendirme: **1 ay ücretsiz deneme, sonra ücretli** (ücretsiz sürüm yok)
+  - Aylık ₺49,99 · Yıllık ₺399 · Aile ₺599/yıl (örnek fiyatlar)
+  - Deneme bitince: kayıtlar silinmez, görüntülenebilir ve dışa aktarılabilir; yeni kayıt ve hatırlatmalar abonelikle
+  - Sahte SMS kontrolü herkese ücretsiz kalır (tanıtım ve yayılma için)
+  - RevenueCat ile mağaza abonelikleri ve gelir paneli
 - Sigorta yenileme için "Teklif al" ortaklığı (komisyon)
 - Garanti başvuru paketi: belge + fatura tek PDF, marka servis numaraları
 
