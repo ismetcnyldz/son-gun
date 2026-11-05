@@ -54,7 +54,8 @@ def tap(page, text):
   page.wait_for_timeout(1200)
 
 def shot(page, name):
-  page.wait_for_timeout(700)
+  page.mouse.move(2, 2)
+  page.wait_for_timeout(1500)
   page.screenshot(path=f'{OUT}/{name}.png')
   print('ok', name)
 
