@@ -8,6 +8,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'models.dart';
 import 'notify.dart';
@@ -16,6 +17,21 @@ import 'sms.dart';
 import 'store.dart';
 
 final store = Store();
+
+/// Tema tercihi: sistem, açık, koyu
+final themeMode = ValueNotifier<ThemeMode>(ThemeMode.system);
+
+Future<void> loadThemeMode() async {
+  final prefs = await SharedPreferences.getInstance();
+  final v = prefs.getString('theme_mode');
+  themeMode.value = ThemeMode.values.firstWhere((m) => m.name == v, orElse: () => ThemeMode.system);
+}
+
+Future<void> setThemeMode(ThemeMode m) async {
+  themeMode.value = m;
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('theme_mode', m.name);
+}
 
 Future<void> main() async {
   await runZonedGuarded(_start, (e, st) {
@@ -27,8 +43,8 @@ Future<void> _start() async {
   WidgetsFlutterBinding.ensureInitialized();
   ErrorWidget.builder = (d) => Material(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: SelectableText('Ekran hatası:\n${d.exceptionAsString()}', style: const TextStyle(fontSize: 12)),
+          padding: EdgeInsets.all(16),
+          child: SelectableText('Ekran hatası:\n${d.exceptionAsString()}', style: TextStyle(fontSize: 12)),
         ),
       );
   if (!kIsWeb) {
@@ -37,66 +53,134 @@ Future<void> _start() async {
     } catch (_) {/* bildirim izni yoksa uygulama yine açılsın */}
   }
   try {
+    await loadThemeMode();
+  } catch (_) {}
+  try {
     await store.load();
   } catch (e) {
     debugPrint('Kayıtlar yüklenemedi: $e');
   }
-  runApp(const SonGunApp());
+  runApp(SonGunApp());
 }
 
 // ---------------------------------------------------------------- Tasarım
-class C {
-  static const bg = Color(0xFFF3F1EC);
-  static const card = Color(0xFFFFFDF9);
-  static const card2 = Color(0xFFEBE7DF);
-  static const ink = Color(0xFF22262B);
-  static const muted = Color(0xFF6B6F75);
-  static const line = Color(0xFFDDD8CE);
-  static const accent = Color(0xFF2F5D62);
-  static const accentDark = Color(0xFF1F4246);
-  static const red = Color(0xFFC2412D);
-  static const amber = Color(0xFFC98A12);
-  static const green = Color(0xFF3C7D4F);
+class Pal {
+  const Pal({required this.bg, required this.card, required this.card2, required this.ink, required this.muted,
+      required this.line, required this.accent, required this.onAccent, required this.onInk,
+      required this.red, required this.amber, required this.green});
+  final Color bg, card, card2, ink, muted, line, accent, onAccent, onInk, red, amber, green;
 }
 
-TextStyle display(double size, {Color color = C.ink, FontWeight w = FontWeight.w700}) =>
-    GoogleFonts.fraunces(fontSize: size, fontWeight: w, color: color, height: 1.05, letterSpacing: -0.4);
+const lightPal = Pal(
+  bg: Color(0xFFF3F1EC), card: Color(0xFFFFFDF9), card2: Color(0xFFEBE7DF), ink: Color(0xFF22262B),
+  muted: Color(0xFF6B6F75), line: Color(0xFFDDD8CE), accent: Color(0xFF2F5D62), onAccent: Color(0xFFFFFFFF),
+  onInk: Color(0xFFFFFFFF), red: Color(0xFFC2412D), amber: Color(0xFFC98A12), green: Color(0xFF3C7D4F),
+);
 
-class SonGunApp extends StatelessWidget {
-  const SonGunApp({super.key});
+const darkPal = Pal(
+  bg: Color(0xFF15181B), card: Color(0xFF1F2327), card2: Color(0xFF2A2F34), ink: Color(0xFFECE8E0),
+  muted: Color(0xFFA3A7AD), line: Color(0xFF353A40), accent: Color(0xFF7DC1C6), onAccent: Color(0xFF0F1A1C),
+  onInk: Color(0xFF15181B), red: Color(0xFFEF8069), amber: Color(0xFFE9B85A), green: Color(0xFF82C795),
+);
+
+/// Geçerli tema renkleri. Tema değişince bütün ekran yeniden çizilir.
+class C {
+  static Pal p = lightPal;
+  static Color get bg => p.bg;
+  static Color get card => p.card;
+  static Color get card2 => p.card2;
+  static Color get ink => p.ink;
+  static Color get muted => p.muted;
+  static Color get line => p.line;
+  static Color get accent => p.accent;
+  static Color get onAccent => p.onAccent;
+  static Color get onInk => p.onInk;
+  static Color get red => p.red;
+  static Color get amber => p.amber;
+  static Color get green => p.green;
+  static const heroA = Color(0xFF2F5D62);
+  static const heroB = Color(0xFF1C3B3F);
+}
+
+TextStyle display(double size, {Color? color, FontWeight w = FontWeight.w700}) =>
+    GoogleFonts.fraunces(fontSize: size, fontWeight: w, color: color ?? C.ink, height: 1.05, letterSpacing: -0.4);
+
+class SonGunApp extends StatefulWidget {
+  SonGunApp({super.key});
+  @override
+  State<SonGunApp> createState() => _SonGunAppState();
+}
+
+class _SonGunAppState extends State<SonGunApp> with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    themeMode.addListener(_changed);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    themeMode.removeListener(_changed);
+    super.dispose();
+  }
+
+  void _changed() => setState(() {});
+
+  @override
+  void didChangePlatformBrightness() => setState(() {});
+
+  bool get _dark => switch (themeMode.value) {
+        ThemeMode.dark => true,
+        ThemeMode.light => false,
+        ThemeMode.system => WidgetsBinding.instance.platformDispatcher.platformBrightness == Brightness.dark,
+      };
 
   @override
   Widget build(BuildContext context) {
+    final dark = _dark;
+    C.p = dark ? darkPal : lightPal;
     final base = ThemeData(
       useMaterial3: true,
-      colorScheme: ColorScheme.fromSeed(seedColor: C.accent, surface: C.card, primary: C.accent),
+      brightness: dark ? Brightness.dark : Brightness.light,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: C.heroA,
+        brightness: dark ? Brightness.dark : Brightness.light,
+        surface: C.card,
+        primary: C.accent,
+        onPrimary: C.onAccent,
+      ),
       scaffoldBackgroundColor: C.bg,
     );
     return MaterialApp(
+      key: ValueKey(dark),
       title: appName,
       debugShowCheckedModeBanner: false,
-      locale: const Locale('tr'),
-      supportedLocales: const [Locale('tr')],
-      localizationsDelegates: const [
+      locale: Locale('tr'),
+      supportedLocales: [Locale('tr')],
+      localizationsDelegates: [
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
       theme: base.copyWith(
         textTheme: GoogleFonts.manropeTextTheme(base.textTheme).apply(bodyColor: C.ink, displayColor: C.ink),
-        appBarTheme: const AppBarTheme(backgroundColor: C.bg, surfaceTintColor: Colors.transparent, elevation: 0),
+        appBarTheme: AppBarTheme(backgroundColor: C.bg, foregroundColor: C.ink, surfaceTintColor: Colors.transparent, elevation: 0),
+        snackBarTheme: SnackBarThemeData(backgroundColor: C.ink, contentTextStyle: TextStyle(color: C.onInk)),
+        dividerColor: C.line,
         cardTheme: CardThemeData(
           color: C.card,
           elevation: 0,
           margin: EdgeInsets.zero,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: const BorderSide(color: C.line)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18), side: BorderSide(color: C.line)),
         ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: C.card,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: C.line)),
-          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: C.line)),
-          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: C.accent, width: 2)),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: C.line)),
+          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: C.line)),
+          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: BorderSide(color: C.accent, width: 2)),
         ),
         navigationBarTheme: NavigationBarThemeData(
           backgroundColor: C.card,
@@ -106,7 +190,8 @@ class SonGunApp extends StatelessWidget {
         filledButtonTheme: FilledButtonThemeData(
           style: FilledButton.styleFrom(
             backgroundColor: C.accent,
-            minimumSize: const Size.fromHeight(52),
+            foregroundColor: C.onAccent,
+            minimumSize: Size.fromHeight(52),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             textStyle: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w800),
           ),
@@ -114,14 +199,14 @@ class SonGunApp extends StatelessWidget {
         outlinedButtonTheme: OutlinedButtonThemeData(
           style: OutlinedButton.styleFrom(
             foregroundColor: C.ink,
-            minimumSize: const Size.fromHeight(52),
-            side: const BorderSide(color: C.line),
+            minimumSize: Size.fromHeight(52),
+            side: BorderSide(color: C.line),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             textStyle: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w700),
           ),
         ),
       ),
-      home: const Shell(),
+      home: Shell(),
     );
   }
 }
@@ -162,7 +247,7 @@ Color urgency(int? days) {
   return C.green;
 }
 
-const _weekdays = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
+final _weekdays = ['Pazartesi', 'Salı', 'Çarşamba', 'Perşembe', 'Cuma', 'Cumartesi', 'Pazar'];
 String todayText() {
   final d = DateTime.now();
   return '${d.day} ${trMonths[d.month - 1]} ${_weekdays[d.weekday - 1]}';
@@ -174,7 +259,7 @@ Future<void> openEditor(BuildContext context, {Item? item, Kind? kind}) async {
 
 // ---------------------------------------------------------------- İskelet
 class Shell extends StatefulWidget {
-  const Shell({super.key});
+  Shell({super.key});
   @override
   State<Shell> createState() => _ShellState();
 }
@@ -184,26 +269,26 @@ class _ShellState extends State<Shell> {
 
   @override
   Widget build(BuildContext context) {
-    final pages = [HomePage(onTab: (i) => setState(() => tab = i)), const PaymentsPage(), const SmsPage()];
+    final pages = [HomePage(onTab: (i) => setState(() => tab = i)), PaymentsPage(), SmsPage()];
     return Scaffold(
       body: SafeArea(
         bottom: false,
-        child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 640), child: pages[tab])),
+        child: Center(child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 640), child: pages[tab])),
       ),
       floatingActionButton: tab == 2
           ? null
           : FloatingActionButton.extended(
               backgroundColor: C.ink,
-              foregroundColor: Colors.white,
+              foregroundColor: C.onInk,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
               onPressed: () => openEditor(context, kind: tab == 1 ? Kind.kart : null),
-              icon: const Icon(Icons.add_rounded),
+              icon: Icon(Icons.add_rounded),
               label: Text('Ekle', style: GoogleFonts.manrope(fontWeight: FontWeight.w800)),
             ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: tab,
         onDestinationSelected: (i) => setState(() => tab = i),
-        destinations: const [
+        destinations: [
           NavigationDestination(icon: Icon(Icons.today_outlined), selectedIcon: Icon(Icons.today_rounded), label: 'Ana sayfa'),
           NavigationDestination(icon: Icon(Icons.account_balance_wallet_outlined), selectedIcon: Icon(Icons.account_balance_wallet_rounded), label: 'Ödemeler'),
           NavigationDestination(icon: Icon(Icons.shield_outlined), selectedIcon: Icon(Icons.shield_rounded), label: 'SMS Kontrol'),
@@ -214,27 +299,87 @@ class _ShellState extends State<Shell> {
 }
 
 class PageHeader extends StatelessWidget {
-  const PageHeader({super.key, required this.title, this.sub});
+  PageHeader({super.key, required this.title, this.sub, this.action});
   final String title;
   final String? sub;
+  final Widget? action;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 18, 20, 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          if (sub != null) Text(sub!.toUpperCase(), style: GoogleFonts.manrope(fontSize: 11, letterSpacing: 1.2, fontWeight: FontWeight.w800, color: C.muted)),
-          const SizedBox(height: 4),
-          Text(title, style: display(34)),
+        padding: EdgeInsets.fromLTRB(20, 18, 12, 14),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              if (sub != null) Text(sub!.toUpperCase(), style: GoogleFonts.manrope(fontSize: 11, letterSpacing: 1.2, fontWeight: FontWeight.w800, color: C.muted)),
+              SizedBox(height: 4),
+              Text(title, style: display(34)),
+            ]),
+          ),
+          action ?? ThemeButton(),
         ]),
       );
 }
 
+/// Tema seçimi: Sistem / Açık / Koyu
+class ThemeButton extends StatelessWidget {
+  ThemeButton({super.key});
+
+  IconData get _icon => switch (themeMode.value) {
+        ThemeMode.dark => Icons.dark_mode_rounded,
+        ThemeMode.light => Icons.light_mode_rounded,
+        ThemeMode.system => Icons.brightness_auto_rounded,
+      };
+
+  @override
+  Widget build(BuildContext context) => IconButton(
+        tooltip: 'Tema',
+        icon: Icon(_icon, color: C.ink),
+        style: IconButton.styleFrom(backgroundColor: C.card, side: BorderSide(color: C.line)),
+        onPressed: () => showModalBottomSheet(
+          context: context,
+          backgroundColor: C.card,
+          showDragHandle: true,
+          builder: (ctx) => SafeArea(
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text('Görünüm', style: display(22)),
+                SizedBox(height: 12),
+                for (final (m, t, i) in [
+                  (ThemeMode.system, 'Telefonla aynı', Icons.brightness_auto_rounded),
+                  (ThemeMode.light, 'Açık tema', Icons.light_mode_rounded),
+                  (ThemeMode.dark, 'Koyu tema', Icons.dark_mode_rounded),
+                ])
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 8),
+                    child: Material(
+                      color: themeMode.value == m ? C.accent.withValues(alpha: 0.14) : C.card2,
+                      borderRadius: BorderRadius.circular(14),
+                      child: ListTile(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        leading: Icon(i, color: C.accent),
+                        title: Text(t, style: TextStyle(fontWeight: FontWeight.w700, color: C.ink)),
+                        trailing: themeMode.value == m ? Icon(Icons.check_circle_rounded, color: C.accent) : null,
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          setThemeMode(m);
+                        },
+                      ),
+                    ),
+                  ),
+              ]),
+            ),
+          ),
+        ),
+      );
+}
+
 class SectionTitle extends StatelessWidget {
-  const SectionTitle(this.text, {super.key, this.trailing});
+  SectionTitle(this.text, {super.key, this.trailing});
   final String text;
   final Widget? trailing;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.fromLTRB(20, 22, 20, 10),
+        padding: EdgeInsets.fromLTRB(20, 22, 20, 10),
         child: Row(children: [
           Expanded(child: Text(text, style: display(21, w: FontWeight.w600))),
           if (trailing != null) trailing!,
@@ -244,7 +389,7 @@ class SectionTitle extends StatelessWidget {
 
 // ---------------------------------------------------------------- Ana sayfa
 class HomePage extends StatefulWidget {
-  const HomePage({super.key, required this.onTab});
+  HomePage({super.key, required this.onTab});
   final ValueChanged<int> onTab;
   @override
   State<HomePage> createState() => _HomePageState();
@@ -267,45 +412,45 @@ class _HomePageState extends State<HomePage> {
             .where((e) => (e.daysLeft() ?? 999) <= 31)
             .fold<double>(0, (a, e) => a + (e.amount ?? 0));
         return ListView(
-          padding: const EdgeInsets.only(bottom: 110),
+          padding: EdgeInsets.only(bottom: 110),
           children: [
             PageHeader(title: appName, sub: todayText()),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _hero(soon, week)),
-            const SizedBox(height: 10),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: _hero(soon, week)),
+            SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(children: [
                 Expanded(child: StatTile(value: fmtMoney(monthPay), label: '31 gün içinde ödenecek', icon: Icons.payments_rounded)),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(child: StatTile(value: '${all.length}', label: 'Kayıtlı belge ve ödeme', icon: Icons.folder_rounded)),
               ]),
             ),
             if (all.isEmpty) ...[
-              const SectionTitle('Başlayalım'),
+              SectionTitle('Başlayalım'),
               _onboarding(),
             ] else ...[
-              SectionTitle('Yaklaşanlar', trailing: Text('${list.length} kayıt', style: const TextStyle(color: C.muted, fontWeight: FontWeight.w600))),
+              SectionTitle('Yaklaşanlar', trailing: Text('${list.length} kayıt', style: TextStyle(color: C.muted, fontWeight: FontWeight.w600))),
               SizedBox(
                 height: 40,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: EdgeInsets.symmetric(horizontal: 16),
                   children: [
                     _chip('Hepsi', null),
                     for (final k in Kind.values) _chip(k.label, k),
                   ],
                 ),
               ),
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               if (list.isEmpty)
-                const Padding(
+                Padding(
                   padding: EdgeInsets.all(28),
                   child: Center(child: Text('Bu kategoride kayıt yok.', style: TextStyle(color: C.muted))),
                 ),
-              for (final it in list) Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: it)),
+              for (final it in list) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: it)),
             ],
-            const SectionTitle('Her şey'),
-            Padding(padding: const EdgeInsets.symmetric(horizontal: 16), child: _grid(all)),
+            SectionTitle('Her şey'),
+            Padding(padding: EdgeInsets.symmetric(horizontal: 16), child: _grid(all)),
           ],
         );
       },
@@ -314,25 +459,25 @@ class _HomePageState extends State<HomePage> {
 
   Widget _hero(int soon, int week) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
-        gradient: const LinearGradient(colors: [C.accent, C.accentDark], begin: Alignment.topLeft, end: Alignment.bottomRight),
-        boxShadow: [BoxShadow(color: C.accent.withValues(alpha: 0.25), blurRadius: 24, offset: const Offset(0, 10))],
+        gradient: LinearGradient(colors: [C.heroA, C.heroB], begin: Alignment.topLeft, end: Alignment.bottomRight),
+        boxShadow: [BoxShadow(color: C.heroA.withValues(alpha: 0.25), blurRadius: 24, offset: Offset(0, 10))],
       ),
       child: Row(children: [
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('$soon', style: display(56, color: Colors.white)),
-            const SizedBox(height: 6),
+            SizedBox(height: 6),
             Text(
               soon == 0 ? 'Önümüzdeki 30 günde süresi dolan bir şey yok. İçin rahat olsun.' : 'kaydın süresi 30 gün içinde doluyor',
               style: GoogleFonts.manrope(color: Colors.white.withValues(alpha: 0.9), fontSize: 14, fontWeight: FontWeight.w600),
             ),
             if (week > 0) ...[
-              const SizedBox(height: 10),
+              SizedBox(height: 10),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(99)),
                 child: Text('$week tanesi bu hafta', style: GoogleFonts.manrope(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800)),
               ),
@@ -343,7 +488,7 @@ class _HomePageState extends State<HomePage> {
           width: 64,
           height: 64,
           decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.14), borderRadius: BorderRadius.circular(18)),
-          child: const Icon(Icons.notifications_active_rounded, color: Colors.white, size: 30),
+          child: Icon(Icons.notifications_active_rounded, color: Colors.white, size: 30),
         ),
       ]),
     );
@@ -352,19 +497,19 @@ class _HomePageState extends State<HomePage> {
   Widget _chip(String t, Kind? k) {
     final sel = filter == k;
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
+      padding: EdgeInsets.only(right: 8),
       child: GestureDetector(
         onTap: () => setState(() => filter = k),
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 180),
-          padding: const EdgeInsets.symmetric(horizontal: 14),
+          duration: Duration(milliseconds: 180),
+          padding: EdgeInsets.symmetric(horizontal: 14),
           alignment: Alignment.center,
           decoration: BoxDecoration(
             color: sel ? C.ink : C.card,
             borderRadius: BorderRadius.circular(99),
             border: Border.all(color: sel ? C.ink : C.line),
           ),
-          child: Text(t, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: sel ? Colors.white : C.ink)),
+          child: Text(t, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: sel ? C.onInk : C.ink)),
         ),
       ),
     );
@@ -372,31 +517,31 @@ class _HomePageState extends State<HomePage> {
 
   Widget _onboarding() {
     Widget step(IconData i, String t, String s, Kind k) => Padding(
-          padding: const EdgeInsets.only(bottom: 10),
+          padding: EdgeInsets.only(bottom: 10),
           child: Card(
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
               onTap: () => openEditor(context, kind: k),
               child: Padding(
-                padding: const EdgeInsets.all(14),
+                padding: EdgeInsets.all(14),
                 child: Row(children: [
                   IconBox(icon: i, color: C.accent),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(t, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                      const SizedBox(height: 2),
-                      Text(s, style: const TextStyle(color: C.muted, fontSize: 13)),
+                      Text(t, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                      SizedBox(height: 2),
+                      Text(s, style: TextStyle(color: C.muted, fontSize: 13)),
                     ]),
                   ),
-                  const Icon(Icons.chevron_right_rounded, color: C.muted),
+                  Icon(Icons.chevron_right_rounded, color: C.muted),
                 ]),
               ),
             ),
           ),
         );
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: 16),
       child: Column(children: [
         step(Icons.directions_car_rounded, 'Aracının belgelerini ekle', 'Trafik sigortası, kasko, muayene', Kind.belge),
         step(Icons.credit_card_rounded, 'Kart son ödeme günlerini ekle', 'Sadece banka ve gün; kart numarası istenmez', Kind.kart),
@@ -417,7 +562,7 @@ class _HomePageState extends State<HomePage> {
     return GridView.count(
       crossAxisCount: 3,
       shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
+      physics: NeverScrollableScrollPhysics(),
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       childAspectRatio: 0.98,
@@ -435,9 +580,9 @@ class _HomePageState extends State<HomePage> {
               },
               child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                 IconBox(icon: kindIcon(k), color: C.accent, size: 42),
-                const SizedBox(height: 8),
-                Text(name, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
-                Text('${all.where((e) => e.kind == k).length} kayıt', style: const TextStyle(color: C.muted, fontSize: 11)),
+                SizedBox(height: 8),
+                Text(name, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                Text('${all.where((e) => e.kind == k).length} kayıt', style: TextStyle(color: C.muted, fontSize: 11)),
               ]),
             ),
           ),
@@ -445,7 +590,7 @@ class _HomePageState extends State<HomePage> {
           child: InkWell(
             borderRadius: BorderRadius.circular(18),
             onTap: () => widget.onTab(2),
-            child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               IconBox(icon: Icons.shield_rounded, color: C.red, size: 42),
               SizedBox(height: 8),
               Text('SMS Kontrol', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
@@ -459,7 +604,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class IconBox extends StatelessWidget {
-  const IconBox({super.key, required this.icon, required this.color, this.size = 46});
+  IconBox({super.key, required this.icon, required this.color, this.size = 46});
   final IconData icon;
   final Color color;
   final double size;
@@ -473,28 +618,28 @@ class IconBox extends StatelessWidget {
 }
 
 class StatTile extends StatelessWidget {
-  const StatTile({super.key, required this.value, required this.label, required this.icon, this.color = C.ink});
+  StatTile({super.key, required this.value, required this.label, required this.icon, this.color});
   final String value;
   final String label;
   final IconData icon;
-  final Color color;
+  final Color? color;
   @override
   Widget build(BuildContext context) => Card(
         child: Padding(
-          padding: const EdgeInsets.all(14),
+          padding: EdgeInsets.all(14),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Icon(icon, size: 20, color: C.muted),
-            const SizedBox(height: 10),
-            FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, style: display(24, color: color))),
-            const SizedBox(height: 2),
-            Text(label, style: const TextStyle(color: C.muted, fontSize: 12, fontWeight: FontWeight.w600)),
+            SizedBox(height: 10),
+            FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: Text(value, style: display(24, color: color ?? C.ink))),
+            SizedBox(height: 2),
+            Text(label, style: TextStyle(color: C.muted, fontSize: 12, fontWeight: FontWeight.w600)),
           ]),
         ),
       );
 }
 
 class ItemCard extends StatelessWidget {
-  const ItemCard({super.key, required this.item});
+  ItemCard({super.key, required this.item});
   final Item item;
 
   @override
@@ -517,29 +662,29 @@ class ItemCard extends StatelessWidget {
             Container(width: 5, color: (d ?? 999) <= 30 ? c : Colors.transparent),
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(12, 12, 14, 12),
+                padding: EdgeInsets.fromLTRB(12, 12, 14, 12),
                 child: Column(children: [
                   Row(children: [
                     IconBox(icon: iconFor(item), color: c == C.green ? C.accent : c),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
-                        const SizedBox(height: 2),
-                        Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: const TextStyle(color: C.muted, fontSize: 12.5)),
+                        Text(item.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15)),
+                        SizedBox(height: 2),
+                        Text(sub, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(color: C.muted, fontSize: 12.5)),
                         if (item.amount != null) ...[
-                          const SizedBox(height: 4),
-                          Text(fmtMoney(item.amount!), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                          SizedBox(height: 4),
+                          Text(fmtMoney(item.amount!), style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
                         ],
                       ]),
                     ),
                     if (d != null)
                       Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Text(d < 0 ? '${-d}' : (d == 0 ? '!' : '$d'), style: display(28, color: c)),
-                        Text(d < 0 ? 'gün geçti' : (d == 0 ? 'bugün' : 'gün kaldı'), style: const TextStyle(fontSize: 11, color: C.muted, fontWeight: FontWeight.w600)),
+                        Text(d < 0 ? 'gün geçti' : (d == 0 ? 'bugün' : 'gün kaldı'), style: TextStyle(fontSize: 11, color: C.muted, fontWeight: FontWeight.w600)),
                       ]),
                   ]),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(99),
                     child: LinearProgressIndicator(value: progress, minHeight: 4, color: c, backgroundColor: C.card2),
@@ -556,7 +701,7 @@ class ItemCard extends StatelessWidget {
 
 // ---------------------------------------------------------------- Ödemeler
 class PaymentsPage extends StatelessWidget {
-  const PaymentsPage({super.key});
+  PaymentsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -568,41 +713,41 @@ class PaymentsPage extends StatelessWidget {
         final total = store.monthlyTotal();
         final cardTotal = cards.fold<double>(0, (a, e) => a + (e.amount ?? 0));
         return ListView(
-          padding: const EdgeInsets.only(bottom: 110),
+          padding: EdgeInsets.only(bottom: 110),
           children: [
-            const PageHeader(title: 'Ödemeler', sub: 'Kartlar ve abonelikler'),
+            PageHeader(title: 'Ödemeler', sub: 'Kartlar ve abonelikler'),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(children: [
                 Expanded(child: StatTile(value: fmtMoney(total), label: 'Aylık abonelik', icon: Icons.autorenew_rounded)),
-                const SizedBox(width: 10),
+                SizedBox(width: 10),
                 Expanded(child: StatTile(value: fmtMoney(total * 12), label: 'Yıllık abonelik', icon: Icons.calendar_month_rounded)),
               ]),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: StatTile(value: fmtMoney(cardTotal), label: 'Kart ekstreleri toplamı', icon: Icons.credit_card_rounded),
             ),
-            SectionTitle('Kartlar', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.kart), icon: const Icon(Icons.add_rounded, size: 18), label: const Text('Kart ekle'))),
+            SectionTitle('Kartlar', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.kart), icon: Icon(Icons.add_rounded, size: 18), label: Text('Kart ekle'))),
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
               child: Container(
-                padding: const EdgeInsets.all(12),
+                padding: EdgeInsets.all(12),
                 decoration: BoxDecoration(color: C.card2, borderRadius: BorderRadius.circular(14)),
-                child: const Row(children: [
+                child: Row(children: [
                   Icon(Icons.lock_rounded, size: 18, color: C.accent),
                   SizedBox(width: 10),
                   Expanded(child: Text('Kart numarası, CVV veya şifre asla istenmez. Sadece banka adı ve son ödeme günü tutulur.', style: TextStyle(fontSize: 12.5))),
                 ]),
               ),
             ),
-            const SizedBox(height: 8),
-            if (cards.isEmpty) const _Empty('Henüz kart eklenmedi.'),
-            for (final c in cards) Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: c)),
-            SectionTitle('Abonelikler', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.abonelik), icon: const Icon(Icons.add_rounded, size: 18), label: const Text('Abonelik ekle'))),
-            if (subs.isEmpty) const _Empty('Henüz abonelik eklenmedi.'),
-            for (final s in subs) Padding(padding: const EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: s)),
+            SizedBox(height: 8),
+            if (cards.isEmpty) _Empty('Henüz kart eklenmedi.'),
+            for (final c in cards) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: c)),
+            SectionTitle('Abonelikler', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.abonelik), icon: Icon(Icons.add_rounded, size: 18), label: Text('Abonelik ekle'))),
+            if (subs.isEmpty) _Empty('Henüz abonelik eklenmedi.'),
+            for (final s in subs) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: s)),
           ],
         );
       },
@@ -611,18 +756,18 @@ class PaymentsPage extends StatelessWidget {
 }
 
 class _Empty extends StatelessWidget {
-  const _Empty(this.text);
+  _Empty(this.text);
   final String text;
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-        child: Text(text, style: const TextStyle(color: C.muted)),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        child: Text(text, style: TextStyle(color: C.muted)),
       );
 }
 
 // ---------------------------------------------------------------- SMS Kontrol
 class SmsPage extends StatefulWidget {
-  const SmsPage({super.key});
+  SmsPage({super.key});
   @override
   State<SmsPage> createState() => _SmsPageState();
 }
@@ -651,14 +796,14 @@ class _SmsPageState extends State<SmsPage> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.only(bottom: 40),
+      padding: EdgeInsets.only(bottom: 40),
       children: [
-        const PageHeader(title: 'Bu SMS sahte mi?', sub: 'Dolandırıcılık kontrolü'),
+        PageHeader(title: 'Bu SMS sahte mi?', sub: 'Dolandırıcılık kontrolü'),
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
+          padding: EdgeInsets.symmetric(horizontal: 16),
           child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            const Text('Şüphelendiğin mesajı yapıştır. İçindeki linke tıklamadan kontrol edelim.', style: TextStyle(color: C.muted)),
-            const SizedBox(height: 12),
+            Text('Şüphelendiğin mesajı yapıştır. İçindeki linke tıklamadan kontrol edelim.', style: TextStyle(color: C.muted)),
+            SizedBox(height: 12),
             TextField(
               controller: ctl,
               minLines: 5,
@@ -667,7 +812,7 @@ class _SmsPageState extends State<SmsPage> {
                 hintText: 'Mesajı buraya yapıştır',
                 suffixIcon: IconButton(
                   tooltip: 'Yapıştır',
-                  icon: const Icon(Icons.content_paste_rounded),
+                  icon: Icon(Icons.content_paste_rounded),
                   onPressed: () async {
                     final d = await Clipboard.getData('text/plain');
                     if (d?.text != null) setState(() => ctl.text = d!.text!);
@@ -675,15 +820,15 @@ class _SmsPageState extends State<SmsPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Row(children: [
-              Expanded(child: OutlinedButton(onPressed: () => setState(() { ctl.text = _samples[0]; v = null; }), child: const Text('Örnek: sahte icra'))),
-              const SizedBox(width: 8),
-              Expanded(child: OutlinedButton(onPressed: () => setState(() { ctl.text = _samples[1]; v = null; }), child: const Text('Örnek: kargo'))),
+              Expanded(child: OutlinedButton(onPressed: () => setState(() { ctl.text = _samples[0]; v = null; }), child: Text('Örnek: sahte icra'))),
+              SizedBox(width: 8),
+              Expanded(child: OutlinedButton(onPressed: () => setState(() { ctl.text = _samples[1]; v = null; }), child: Text('Örnek: kargo'))),
             ]),
-            const SizedBox(height: 10),
-            FilledButton.icon(onPressed: _check, icon: const Icon(Icons.search_rounded), label: const Text('Kontrol et')),
-            const SizedBox(height: 16),
+            SizedBox(height: 10),
+            FilledButton.icon(onPressed: _check, icon: Icon(Icons.search_rounded), label: Text('Kontrol et')),
+            SizedBox(height: 16),
             if (v != null) _result(v!),
           ]),
         ),
@@ -694,7 +839,7 @@ class _SmsPageState extends State<SmsPage> {
   Widget _result(SmsVerdict v) {
     final c = v.risky ? C.red : (v.reasons.isEmpty ? C.green : C.amber);
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: c.withValues(alpha: 0.08),
         border: Border.all(color: c.withValues(alpha: 0.6)),
@@ -703,7 +848,7 @@ class _SmsPageState extends State<SmsPage> {
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Icon(v.risky ? Icons.gpp_bad_rounded : Icons.gpp_good_rounded, color: c, size: 30),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
           Expanded(
             child: Text(
               v.risky ? 'Büyük ihtimalle dolandırıcılık' : (v.reasons.isEmpty ? 'Şüpheli bir işaret bulunmadı' : 'Dikkatli ol'),
@@ -711,22 +856,22 @@ class _SmsPageState extends State<SmsPage> {
             ),
           ),
         ]),
-        const SizedBox(height: 12),
+        SizedBox(height: 12),
         for (final r in v.reasons)
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: EdgeInsets.only(bottom: 6),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Icon(Icons.circle, size: 6, color: c),
-              const SizedBox(width: 8),
-              Expanded(child: Text(r, style: const TextStyle(fontSize: 13.5, height: 1.35))),
+              SizedBox(width: 8),
+              Expanded(child: Text(r, style: TextStyle(fontSize: 13.5, height: 1.35))),
             ]),
           ),
-        const SizedBox(height: 6),
+        SizedBox(height: 6),
         Text(
           v.risky
               ? 'Linke tıklama, ödeme yapma, kod paylaşma. Borcun olup olmadığını e-Devlet\'ten kendin kontrol et.'
               : 'Yine de emin değilsen linke tıklamak yerine kurumun kendi uygulamasından kontrol et.',
-          style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
+          style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
         ),
       ]),
     );
@@ -735,7 +880,7 @@ class _SmsPageState extends State<SmsPage> {
 
 // ---------------------------------------------------------------- Ekle / Düzenle
 class EditorPage extends StatefulWidget {
-  const EditorPage({super.key, this.item, this.initialKind});
+  EditorPage({super.key, this.item, this.initialKind});
   final Item? item;
   final Kind? initialKind;
   @override
@@ -812,7 +957,7 @@ class _EditorPageState extends State<EditorPage> {
     final now = DateTime.now();
     final d = await showDatePicker(
       context: context,
-      initialDate: date ?? now.add(const Duration(days: 30)),
+      initialDate: date ?? now.add(Duration(days: 30)),
       firstDate: DateTime(now.year - 2),
       lastDate: DateTime(now.year + 15),
       helpText: 'Son günü seç',
@@ -841,7 +986,7 @@ class _EditorPageState extends State<EditorPage> {
   void _toast(String t) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t), behavior: SnackBarBehavior.floating));
 
   Widget _label(String t) => Padding(
-        padding: const EdgeInsets.only(top: 20, bottom: 8),
+        padding: EdgeInsets.only(top: 20, bottom: 8),
         child: Text(t.toUpperCase(), style: GoogleFonts.manrope(fontSize: 11, letterSpacing: 1.1, fontWeight: FontWeight.w800, color: C.muted)),
       );
 
@@ -860,20 +1005,20 @@ class _EditorPageState extends State<EditorPage> {
                 await store.remove(widget.item!.id);
                 if (context.mounted) Navigator.of(context).pop();
               },
-              child: Text(confirmDelete ? 'Emin misin? Sil' : 'Sil', style: const TextStyle(color: C.red, fontWeight: FontWeight.w800)),
+              child: Text(confirmDelete ? 'Emin misin? Sil' : 'Sil', style: TextStyle(color: C.red, fontWeight: FontWeight.w800)),
             ),
         ],
       ),
       body: SafeArea(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(16, 4, 16, 24),
+          padding: EdgeInsets.fromLTRB(16, 4, 16, 24),
           children: [
             _photoCard(),
             _label('Ne ekliyorsun?'),
             GridView.count(
               crossAxisCount: 5,
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: NeverScrollableScrollPhysics(),
               crossAxisSpacing: 6,
               childAspectRatio: 0.78,
               children: [
@@ -881,19 +1026,19 @@ class _EditorPageState extends State<EditorPage> {
                   GestureDetector(
                     onTap: () => setState(() => kind = k),
                     child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 160),
+                      duration: Duration(milliseconds: 160),
                       decoration: BoxDecoration(
                         color: kind == k ? C.ink : C.card,
                         borderRadius: BorderRadius.circular(14),
                         border: Border.all(color: kind == k ? C.ink : C.line),
                       ),
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Icon(kindIcon(k), color: kind == k ? Colors.white : C.accent, size: 22),
-                        const SizedBox(height: 6),
+                        Icon(kindIcon(k), color: kind == k ? C.onInk : C.accent, size: 22),
+                        SizedBox(height: 6),
                         Text(
                           k == Kind.kart ? 'Kart' : k.label,
                           textAlign: TextAlign.center,
-                          style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: kind == k ? Colors.white : C.ink),
+                          style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: kind == k ? C.onInk : C.ink),
                         ),
                       ]),
                     ),
@@ -901,15 +1046,15 @@ class _EditorPageState extends State<EditorPage> {
               ],
             ),
             _label('Başlık'),
-            TextField(controller: title, decoration: const InputDecoration(hintText: 'Örn. Trafik sigortası')),
+            TextField(controller: title, decoration: InputDecoration(hintText: 'Örn. Trafik sigortası')),
             if (sugg.isNotEmpty) ...[
-              const SizedBox(height: 8),
+              SizedBox(height: 8),
               Wrap(spacing: 6, runSpacing: 6, children: [
                 for (final p in sugg)
                   ActionChip(
-                    label: Text(p.title, style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                    label: Text(p.title, style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
                     backgroundColor: C.card,
-                    side: const BorderSide(color: C.line),
+                    side: BorderSide(color: C.line),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(99)),
                     onPressed: () => setState(() => title.text = p.title),
                   ),
@@ -919,14 +1064,14 @@ class _EditorPageState extends State<EditorPage> {
             if (kind.monthly)
               DropdownButtonFormField<int>(
                 value: day,
-                hint: const Text('Gün seç'),
+                hint: Text('Gün seç'),
                 items: [for (var i = 1; i <= 31; i++) DropdownMenuItem(value: i, child: Text('Ayın $i. günü'))],
                 onChanged: (v) => setState(() => day = v),
               )
             else
               OutlinedButton.icon(
                 onPressed: _pickDate,
-                icon: const Icon(Icons.event_rounded),
+                icon: Icon(Icons.event_rounded),
                 style: OutlinedButton.styleFrom(alignment: Alignment.centerLeft, backgroundColor: C.card),
                 label: Text(date == null ? 'Tarih seç' : fmtDate(date!)),
               ),
@@ -938,26 +1083,26 @@ class _EditorPageState extends State<EditorPage> {
             _label(kind == Kind.kart ? 'Ekstre tutarı' : 'Tutar'),
             TextField(
               controller: amount,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              decoration: const InputDecoration(hintText: 'İsteğe bağlı', prefixText: '₺ '),
+              keyboardType: TextInputType.numberWithOptions(decimal: true),
+              decoration: InputDecoration(hintText: 'İsteğe bağlı', prefixText: '₺ '),
             ),
-            const SizedBox(height: 14),
+            SizedBox(height: 14),
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(color: C.card2, borderRadius: BorderRadius.circular(14)),
               child: Row(children: [
-                const Icon(Icons.notifications_rounded, size: 18, color: C.accent),
-                const SizedBox(width: 10),
+                Icon(Icons.notifications_rounded, size: 18, color: C.accent),
+                SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     kind.monthly ? 'Hatırlatma: 3 gün ve 1 gün kala, son gün sabahı.' : 'Hatırlatma: 30, 7 ve 1 gün kala, son gün sabahı.',
-                    style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
+                    style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
                   ),
                 ),
               ]),
             ),
-            const SizedBox(height: 20),
-            FilledButton(onPressed: scanning ? null : _save, child: const Text('Kaydet')),
+            SizedBox(height: 20),
+            FilledButton(onPressed: scanning ? null : _save, child: Text('Kaydet')),
           ],
         ),
       ),
@@ -967,9 +1112,9 @@ class _EditorPageState extends State<EditorPage> {
   Widget _photoCard() {
     if (kIsWeb) {
       return Container(
-        padding: const EdgeInsets.all(14),
+        padding: EdgeInsets.all(14),
         decoration: BoxDecoration(color: C.card2, borderRadius: BorderRadius.circular(16)),
-        child: const Row(children: [
+        child: Row(children: [
           Icon(Icons.info_outline_rounded, color: C.accent),
           SizedBox(width: 10),
           Expanded(
@@ -990,16 +1135,16 @@ class _EditorPageState extends State<EditorPage> {
             height: 120,
             width: double.infinity,
             color: C.card2,
-            child: const Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
               Icon(Icons.document_scanner_rounded, size: 36, color: C.accent),
               SizedBox(height: 6),
               Text('Fotoğrafını çek, tarihi biz okuyalım', style: TextStyle(fontWeight: FontWeight.w700)),
             ]),
           ),
         Padding(
-          padding: const EdgeInsets.all(12),
+          padding: EdgeInsets.all(12),
           child: scanning
-              ? const Row(children: [
+              ? Row(children: [
                   SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2)),
                   SizedBox(width: 12),
                   Text('Belge okunuyor…'),
@@ -1008,16 +1153,16 @@ class _EditorPageState extends State<EditorPage> {
                   Expanded(
                     child: FilledButton.icon(
                       onPressed: () => _takePhoto(ImageSource.camera),
-                      icon: const Icon(Icons.photo_camera_rounded),
-                      label: const Text('Fotoğraf çek'),
+                      icon: Icon(Icons.photo_camera_rounded),
+                      label: Text('Fotoğraf çek'),
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  SizedBox(width: 8),
                   Expanded(
                     child: OutlinedButton.icon(
                       onPressed: () => _takePhoto(ImageSource.gallery),
-                      icon: const Icon(Icons.photo_library_rounded),
-                      label: const Text('Galeri'),
+                      icon: Icon(Icons.photo_library_rounded),
+                      label: Text('Galeri'),
                     ),
                   ),
                 ]),
