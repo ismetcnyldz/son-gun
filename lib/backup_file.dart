@@ -12,7 +12,7 @@ import 'main.dart' show store;
 String _fileName() {
   final d = DateTime.now();
   String two(int n) => n.toString().padLeft(2, '0');
-  return 'SonGun-yedek-${d.year}-${two(d.month)}-${two(d.day)}.songun';
+  return 'Durt-yedek-${d.year}-${two(d.month)}-${two(d.day)}.durt';
 }
 
 Future<void> shareBackupFile() async {
@@ -25,7 +25,7 @@ Future<void> shareBackupFile() async {
   final dir = await getTemporaryDirectory();
   final f = File('${dir.path}/$name');
   await f.writeAsBytes(bytes, flush: true);
-  await Share.shareXFiles([XFile(f.path, mimeType: 'text/plain')], subject: 'Son Gün yedeği');
+  await Share.shareXFiles([XFile(f.path, mimeType: 'text/plain')], subject: 'Dürt yedeği');
 }
 
 /// Dosya seçtirir; eklenen kayıt sayısını döner. Vazgeçilirse null.

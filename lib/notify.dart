@@ -88,7 +88,7 @@ class Notifier {
         final when = tz.TZDateTime(tz.local, d.year, d.month, d.day, hour, minute);
         if (!when.isAfter(now)) continue;
         final body = off == 0
-            ? 'Bugün son gün: ${fmtDate(due)}'
+            ? 'Dürt dürt! Bugün son gün: ${fmtDate(due)}'
             : '$off gün kaldı · Son gün ${fmtDate(due)}';
         try {
           await _plugin.zonedSchedule(

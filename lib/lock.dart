@@ -33,7 +33,7 @@ Future<String?> setLockEnabled(bool on) async {
 Future<bool> _authenticate() async {
   try {
     return await LocalAuthentication().authenticate(
-      localizedReason: 'Son Gün\'ü açmak için kimliğini doğrula',
+      localizedReason: 'Dürt\'ü açmak için kimliğini doğrula',
       options: const AuthenticationOptions(stickyAuth: true, biometricOnly: false),
     );
   } catch (_) {
@@ -98,7 +98,7 @@ class _LockGateState extends State<LockGate> with WidgetsBindingObserver {
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               Icon(Icons.lock_rounded, size: 56, color: C.accent),
               const SizedBox(height: 16),
-              Text('Son Gün kilitli', style: display(28)),
+              Text('Dürt kilitli', style: display(28)),
               const SizedBox(height: 8),
               Text('Devam etmek için kimliğini doğrula.', style: TextStyle(color: C.muted)),
               const SizedBox(height: 24),

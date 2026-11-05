@@ -3,7 +3,7 @@ Bildirimler için: core library desugaring, izinler ve zamanlanmış bildirim al
 Tekrar çalıştırılsa da sorun çıkarmaz."""
 import pathlib, re, sys
 
-APP_LABEL = "Son Gün"
+APP_LABEL = "Dürt"
 root = pathlib.Path("android/app")
 
 # --- build.gradle(.kts) ---
@@ -14,6 +14,7 @@ if kts.exists():
     if "isCoreLibraryDesugaringEnabled" not in g:
         g = re.sub(r"compileOptions\s*\{", "compileOptions {\n        isCoreLibraryDesugaringEnabled = true", g, count=1)
     g = re.sub(r"minSdk\s*=\s*flutter\.minSdkVersion", "minSdk = 23", g)
+    g = re.sub(r'applicationId\s*=\s*"[^"]*"', 'applicationId = "com.yildiz.durt"', g)
     if "desugar_jdk_libs" not in g:
         g += '\ndependencies {\n    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")\n}\n'
     kts.write_text(g, encoding="utf-8")

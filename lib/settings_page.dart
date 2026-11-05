@@ -110,7 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
       if (n == null) return;
       _toast(n == 0 ? 'Yeni kayıt bulunamadı (hepsi zaten var).' : '$n kayıt geri yüklendi.');
     } catch (_) {
-      _toast('Bu dosya bir Son Gün yedeği değil ya da bozuk.');
+      _toast('Bu dosya bir Dürt yedeği değil ya da bozuk.');
     }
   }
 
@@ -145,7 +145,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _label('Abonelik'),
             _tile(
               icon: Icons.workspace_premium_rounded,
-              title: 'Son Gün Premium',
+              title: 'Dürt Premium',
               sub: sub,
               onTap: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (_) => const PaywallPage()));
@@ -208,12 +208,12 @@ class _SettingsPageState extends State<SettingsPage> {
               sub: 'iCloud Drive, Google Drive, e-posta ya da WhatsApp\'a kaydet. Telefon kaybolursa buradan geri yüklersin.',
               onTap: _shareFile,
             ),
-            _tile(icon: Icons.file_open_rounded, title: 'Dosyadan geri yükle', sub: 'Kaydettiğin .songun yedek dosyasını seç', onTap: _importFile),
+            _tile(icon: Icons.file_open_rounded, title: 'Dosyadan geri yükle', sub: 'Kaydettiğin .durt yedek dosyasını seç', onTap: _importFile),
             _tile(icon: Icons.copy_all_rounded, title: 'Yedeği metin olarak kopyala', sub: 'Notlara ya da mesaja yapıştırıp sakla', onTap: _copyBackup),
             _tile(icon: Icons.content_paste_go_rounded, title: 'Metinden geri yükle', sub: 'Kopyaladığın yedeği yapıştır', onTap: _restore),
             _label('Destek'),
-            _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Son Gün - Sorun bildirimi')),
-            _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Son Gün - Öneri')),
+            _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Dürt - Sorun bildirimi')),
+            _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Dürt - Öneri')),
             _label('Hakkında'),
             _tile(icon: Icons.shield_moon_rounded, title: 'Gizlilik politikası', sub: 'Kayıtların sadece bu cihazda tutulur. Kart numarası, şifre istenmez.', onTap: () => _open(privacyUrl)),
             _tile(icon: Icons.gavel_rounded, title: 'KVKK aydınlatma metni', onTap: () => _open(kvkkUrl)),

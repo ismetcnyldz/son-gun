@@ -40,7 +40,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final pages = [
       _Slide(
         art: _ArtCountdown(),
-        title: 'Son günü sen unut,\ntelefonun unutmasın.',
+        title: 'Son günü sen unut,\nDürt unutmaz.',
         text: 'Sigorta, muayene, pasaport, garanti, kart ödemesi… Hepsinin son günü tek yerde.',
       ),
       _Slide(

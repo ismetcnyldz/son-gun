@@ -73,7 +73,7 @@ Future<void> _start() async {
   } catch (e) {
     debugPrint('Kayıtlar yüklenemedi: $e');
   }
-  runApp(SonGunApp());
+  runApp(DurtApp());
   // Ödeme sistemi açılışı geciktirmesin; abonelik durumu değişince hatırlatmalar yeniden kurulur
   var wasActive = entitlement.active;
   entitlement.addListener(() {
@@ -127,13 +127,13 @@ class C {
 TextStyle display(double size, {Color? color, FontWeight w = FontWeight.w700}) =>
     GoogleFonts.fraunces(fontSize: size, fontWeight: w, color: color ?? C.ink, height: 1.05, letterSpacing: -0.4);
 
-class SonGunApp extends StatefulWidget {
-  SonGunApp({super.key});
+class DurtApp extends StatefulWidget {
+  DurtApp({super.key});
   @override
-  State<SonGunApp> createState() => _SonGunAppState();
+  State<DurtApp> createState() => _DurtAppState();
 }
 
-class _SonGunAppState extends State<SonGunApp> with WidgetsBindingObserver {
+class _DurtAppState extends State<DurtApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

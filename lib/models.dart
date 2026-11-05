@@ -4,10 +4,10 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Uygulamanın görünen adı. İsim değişirse sadece burası ve AndroidManifest değişir.
-const String appName = 'Son Gün';
+const String appName = 'Dürt';
 
 /// Destek e-postası (alan adı alınınca güncellenecek)
-const String supportEmail = 'destek@songun.app';
+const String supportEmail = 'destek@durt.app';
 const String appVersion = '1.0.0';
 
 /// Yasal sayfalar (alan adı alınınca güncellenecek)

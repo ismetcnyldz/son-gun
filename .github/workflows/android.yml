@@ -70,12 +70,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk SonGun.apk
-          cp build/app/outputs/bundle/release/app-release.aab SonGun.aab
+          cp build/app/outputs/flutter-apk/app-release.apk Durt.apk
+          cp build/app/outputs/bundle/release/app-release.aab Durt.aab
           gh release delete deneme --yes --cleanup-tag || true
-          gh release create deneme SonGun.apk SonGun.aab --target "${{ github.sha }}" --prerelease \
-            --title "Son Gün - deneme sürümü" \
-            --notes "Telefondan SonGun.apk dosyasına dokunup indir, sonra açıp kur. Android 'bilinmeyen kaynak' izni isteyebilir."
+          gh release create deneme Durt.apk Durt.aab --target "${{ github.sha }}" --prerelease \
+            --title "Dürt - deneme sürümü" \
+            --notes "Telefondan Durt.apk dosyasına dokunup indir, sonra açıp kur. Android 'bilinmeyen kaynak' izni isteyebilir."
 
   web:
     runs-on: ubuntu-latest

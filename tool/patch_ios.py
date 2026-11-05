@@ -1,7 +1,7 @@
 """flutter create ile üretilen iOS dosyalarına izin açıklamalarını ve ayarları ekler."""
 import pathlib, re
 
-APP_LABEL = "Son Gün"
+APP_LABEL = "Dürt"
 plist = pathlib.Path("ios/Runner/Info.plist")
 p = plist.read_text(encoding="utf-8")
 
@@ -35,5 +35,6 @@ proj = pathlib.Path("ios/Runner.xcodeproj/project.pbxproj")
 if proj.exists():
     t = proj.read_text(encoding="utf-8")
     t = re.sub(r"IPHONEOS_DEPLOYMENT_TARGET = [\d.]+;", "IPHONEOS_DEPLOYMENT_TARGET = 15.5;", t)
+    t = re.sub(r"PRODUCT_BUNDLE_IDENTIFIER = com\.yildiz\.sonGun(\.RunnerTests)?;", lambda m: f"PRODUCT_BUNDLE_IDENTIFIER = com.yildiz.durt{m.group(1) or ''};", t)
     proj.write_text(t, encoding="utf-8")
 print("iOS ayarları uygulandı.")
