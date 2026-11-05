@@ -18,4 +18,11 @@ void main() {
   test('bozuk dosya tanınıyor', () async {
     expect(() => decryptBackup('DURT2:@@@', 'x'), throwsA(isA<NotABackup>()));
   });
+
+  test('ipucu okunuyor, şifre açık edilmiyor', () async {
+    final enc = await encryptBackup('veri', 'gizli123', hint: 'en sevdiğim renk');
+    expect(backupHint(enc), 'en sevdiğim renk');
+    expect(enc.contains('gizli123'), false);
+    expect(await decryptBackup(enc, 'gizli123'), 'veri');
+  });
 }

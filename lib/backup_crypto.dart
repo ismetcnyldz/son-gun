@@ -23,7 +23,7 @@ Future<SecretKey> _key(String password, List<int> salt, int iterations) =>
     Pbkdf2(macAlgorithm: Hmac.sha256(), iterations: iterations, bits: 256)
         .deriveKeyFromPassword(password: password, nonce: salt);
 
-Future<String> encryptBackup(String plain, String password) async {
+Future<String> encryptBackup(String plain, String password, {String? hint}) async {
   final salt = _random(16);
   final algo = AesGcm.with256bits();
   final key = await _key(password, salt, _iterations);
@@ -35,6 +35,7 @@ Future<String> encryptBackup(String plain, String password) async {
     'n': base64Encode(box.nonce),
     'm': base64Encode(box.mac.bytes),
     'c': base64Encode(box.cipherText),
+    if (hint != null && hint.trim().isNotEmpty) 'h': hint.trim(),
   };
   return backupPrefix + base64Encode(utf8.encode(jsonEncode(payload)));
 }
@@ -55,5 +56,16 @@ Future<String> decryptBackup(String text, String password) async {
     return utf8.decode(clear);
   } on SecretBoxAuthenticationError {
     throw WrongPassword();
+  }
+}
+
+/// Şifreli yedekteki ipucu (şifreyi açık etmez). Yoksa null.
+String? backupHint(String text) {
+  try {
+    final p = jsonDecode(utf8.decode(base64Decode(text.trim().substring(backupPrefix.length)))) as Map<String, dynamic>;
+    final h = p['h'];
+    return h is String && h.isNotEmpty ? h : null;
+  } catch (_) {
+    return null;
   }
 }

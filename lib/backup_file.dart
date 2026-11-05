@@ -12,7 +12,7 @@ import 'backup_crypto.dart';
 import 'main.dart' show store;
 import 'models.dart';
 
-export 'backup_crypto.dart' show WrongPassword, NotABackup;
+export 'backup_crypto.dart' show WrongPassword, NotABackup, backupHint;
 
 String _fileName() {
   final d = DateTime.now();
@@ -43,9 +43,9 @@ Future<String> _buildPlain() async {
 }
 
 /// Şifreli yedek dosyası oluşturup paylaşım ekranını açar. Fotoğraf sayısını döner.
-Future<int> shareBackupFile(String password) async {
+Future<int> shareBackupFile(String password, {String? hint}) async {
   final plain = await _buildPlain();
-  final text = await encryptBackup(plain, password);
+  final text = await encryptBackup(plain, password, hint: hint);
   final bytes = Uint8List.fromList(utf8.encode(text));
   final name = _fileName();
   if (kIsWeb) {

@@ -55,32 +55,57 @@ class _SettingsPageState extends State<SettingsPage> {
     _toast('Hatırlatmalar artık ${Notifier.timeText}\'da gelecek.');
   }
 
-  /// Şifre sorar. confirm: iki kez yazdırır (yeni yedek için)
-  Future<String?> _askPassword({required bool confirm}) async {
+  /// Şifre sorar. confirm: yeni yedek (iki kez + ipucu). Dönüş: (şifre, ipucu)
+  Future<(String, String)?> _askPassword({required bool confirm, String? hint}) async {
     final a = TextEditingController();
     final b = TextEditingController();
+    final h = TextEditingController();
     String? err;
-    final res = await showDialog<String>(
+    final res = await showDialog<(String, String)>(
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setD) => AlertDialog(
           backgroundColor: C.card,
           title: Text(confirm ? 'Yedeğe şifre koy' : 'Yedeğin şifresi', style: display(22)),
-          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-            Text(
-              confirm
-                  ? 'Yedek dosyan bu şifreyle kilitlenir. Dosyayı ele geçiren biri şifre olmadan açamaz.\n\nŞifreyi unutursan yedek açılamaz, bir yere not et.'
-                  : 'Yedeği alırken koyduğun şifreyi yaz.',
-              style: TextStyle(color: C.muted, fontSize: 13, height: 1.4),
+          content: SingleChildScrollView(
+            child: AutofillGroup(
+              child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+                Text(
+                  confirm
+                      ? 'Yedek dosyan bu şifreyle kilitlenir. Şifreyi biz de bilmeyiz; unutursan yedek açılamaz. Telefonun şifreyi kaydetmeyi önerirse kabul et.'
+                      : 'Yedeği alırken koyduğun şifreyi yaz.',
+                  style: TextStyle(color: C.muted, fontSize: 13, height: 1.4),
+                ),
+                if (!confirm && hint != null)
+                  Container(
+                    margin: const EdgeInsets.only(top: 10),
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(color: C.card2, borderRadius: BorderRadius.circular(12)),
+                    child: Row(children: [
+                      Icon(Icons.lightbulb_rounded, size: 18, color: C.amber),
+                      const SizedBox(width: 8),
+                      Expanded(child: Text('İpucu: $hint', style: TextStyle(fontWeight: FontWeight.w700, color: C.ink))),
+                    ]),
+                  ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: a,
+                  obscureText: true,
+                  autofocus: true,
+                  autofillHints: [confirm ? AutofillHints.newPassword : AutofillHints.password],
+                  decoration: const InputDecoration(hintText: 'Şifre'),
+                ),
+                if (confirm) ...[
+                  const SizedBox(height: 8),
+                  TextField(controller: b, obscureText: true, autofillHints: const [AutofillHints.newPassword], decoration: const InputDecoration(hintText: 'Şifre (tekrar)')),
+                  const SizedBox(height: 8),
+                  TextField(controller: h, maxLength: 60, decoration: const InputDecoration(hintText: 'İpucu (isteğe bağlı), ör. annemin doğum yılı', counterText: '')),
+                  Text('İpucu dosyada şifresiz durur, şifrenin kendisini yazma.', style: TextStyle(color: C.muted, fontSize: 11.5)),
+                ],
+                if (err != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(err!, style: TextStyle(color: C.red, fontSize: 12.5))),
+              ]),
             ),
-            const SizedBox(height: 12),
-            TextField(controller: a, obscureText: true, autofocus: true, decoration: const InputDecoration(hintText: 'Şifre')),
-            if (confirm) ...[
-              const SizedBox(height: 8),
-              TextField(controller: b, obscureText: true, decoration: const InputDecoration(hintText: 'Şifre (tekrar)')),
-            ],
-            if (err != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(err!, style: TextStyle(color: C.red, fontSize: 12.5))),
-          ]),
+          ),
           actions: [
             TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Vazgeç')),
             FilledButton(
@@ -88,8 +113,10 @@ class _SettingsPageState extends State<SettingsPage> {
               onPressed: () {
                 if (confirm && a.text.length < 6) return setD(() => err = 'En az 6 karakter olsun.');
                 if (confirm && a.text != b.text) return setD(() => err = 'İki şifre aynı değil.');
+                if (confirm && h.text.trim().isNotEmpty && h.text.contains(a.text)) return setD(() => err = 'İpucu şifrenin kendisini içermesin.');
                 if (a.text.isEmpty) return;
-                Navigator.pop(ctx, a.text);
+                TextInput.finishAutofillContext();
+                Navigator.pop(ctx, (a.text, h.text));
               },
               child: Text(confirm ? 'Yedeği oluştur' : 'Aç'),
             ),
@@ -102,11 +129,11 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _shareFile() async {
     if (store.items.isEmpty) return _toast('Henüz yedeklenecek kayıt yok.');
-    final pw = await _askPassword(confirm: true);
-    if (pw == null) return;
+    final r = await _askPassword(confirm: true);
+    if (r == null) return;
     _toast('Yedek hazırlanıyor…');
     try {
-      await shareBackupFile(pw);
+      await shareBackupFile(r.$1, hint: r.$2);
     } catch (_) {
       _toast('Yedek dosyası oluşturulamadı.');
     }
@@ -118,8 +145,9 @@ class _SettingsPageState extends State<SettingsPage> {
       if (text == null) return;
       String? pw;
       if (text.trimLeft().startsWith('DURT2:')) {
-        pw = await _askPassword(confirm: false);
-        if (pw == null) return;
+        final r = await _askPassword(confirm: false, hint: backupHint(text));
+        if (r == null) return;
+        pw = r.$1;
         _toast('Yedek açılıyor…');
       }
       final n = await restoreBackup(text, password: pw);
