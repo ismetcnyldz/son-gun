@@ -48,5 +48,32 @@ RenewLink? renewLinkFor(Item it) {
     return const RenewLink('Nüfus randevusu al', 'https://randevu.nvi.gov.tr');
   }
   if (t.contains('dask') || t.contains('zorunlu deprem')) return const RenewLink('DASK poliçeni sorgula', 'https://www.dask.gov.tr');
+  if (it.kind == Kind.abonelik) {
+    for (final (k, url) in _manage) {
+      if (RegExp('(^|[^a-zçğıöşü])${RegExp.escape(k)}').hasMatch(t)) return RenewLink('Aboneliği yönet / iptal et', url);
+    }
+  }
   return null;
 }
+
+/// Abonelik yönetim / iptal sayfaları
+const _manage = [
+  ('netflix', 'https://www.netflix.com/cancelplan'),
+  ('spotify', 'https://www.spotify.com/tr/account/overview/'),
+  ('youtube', 'https://www.youtube.com/paid_memberships'),
+  ('disney', 'https://www.disneyplus.com/account'),
+  ('amazon', 'https://www.amazon.com.tr/gp/primecentral'),
+  ('prime', 'https://www.amazon.com.tr/gp/primecentral'),
+  ('exxen', 'https://www.exxen.com'),
+  ('max', 'https://www.max.com'),
+  ('tod', 'https://www.tod.tv'),
+  ('gain', 'https://www.gain.tv'),
+  ('icloud', 'https://apps.apple.com/account/subscriptions'),
+  ('apple', 'https://apps.apple.com/account/subscriptions'),
+  ('google one', 'https://one.google.com/settings'),
+  ('turkcell', 'https://www.turkcell.com.tr'),
+  ('vodafone', 'https://www.vodafone.com.tr'),
+  ('türk telekom', 'https://www.turktelekom.com.tr'),
+  ('turk telekom', 'https://www.turktelekom.com.tr'),
+  ('superonline', 'https://www.superonline.net'),
+];

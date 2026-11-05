@@ -52,6 +52,39 @@ elif groovy.exists():
                    g, count=1)
         groovy.write_text(g, encoding="utf-8")
 
+# --- Yayın imzası (key.properties varsa) ---
+if kts.exists():
+    g = kts.read_text(encoding="utf-8")
+    if "keystoreProperties" not in g:
+        g = "import java.util.Properties\nimport java.io.FileInputStream\n\n" + g
+        g = g.replace("android {", """val keystoreProperties = Properties()
+val keystorePropertiesFile = rootProject.file("key.properties")
+if (keystorePropertiesFile.exists()) keystoreProperties.load(FileInputStream(keystorePropertiesFile))
+
+android {
+    signingConfigs {
+        create("release") {
+            if (keystorePropertiesFile.exists()) {
+                keyAlias = keystoreProperties["keyAlias"] as String
+                keyPassword = keystoreProperties["keyPassword"] as String
+                storeFile = file(keystoreProperties["storeFile"] as String)
+                storePassword = keystoreProperties["storePassword"] as String
+            }
+        }
+    }""", 1)
+        g = g.replace('signingConfig = signingConfigs.getByName("debug")',
+                      'signingConfig = if (keystorePropertiesFile.exists()) signingConfigs.getByName("release") else signingConfigs.getByName("debug")')
+        kts.write_text(g, encoding="utf-8")
+
+# --- Bildirim simgesi (tek renk) ---
+import shutil
+drw = root / "src/main/res/drawable"
+drw.mkdir(parents=True, exist_ok=True)
+shutil.copy("assets/icon/notify.png", drw / "ic_stat_notify.png")
+raw = root / "src/main/res/raw"
+raw.mkdir(parents=True, exist_ok=True)
+(raw / "keep.xml").write_text('<?xml version="1.0" encoding="utf-8"?>\n<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@drawable/ic_stat_notify" />\n', encoding="utf-8")
+
 # --- AndroidManifest.xml ---
 mf = root / "src/main/AndroidManifest.xml"
 m = mf.read_text(encoding="utf-8")
@@ -78,6 +111,19 @@ receivers = '''
 '''
 if "ScheduledNotificationReceiver" not in m:
     m = m.replace("</application>", receivers + "    </application>", 1)
+queries = """
+    <queries>
+        <intent><action android:name="android.intent.action.INSERT"/><data android:mimeType="vnd.android.cursor.item/event"/></intent>
+        <intent><action android:name="android.intent.action.VIEW"/><data android:scheme="https"/></intent>
+        <intent><action android:name="android.intent.action.SENDTO"/><data android:scheme="mailto"/></intent>
+    </queries>
+"""
+if "vnd.android.cursor.item/event" not in m:
+    if "<queries>" in m:
+        inner = queries.split("<queries>")[1].split("</queries>")[0]
+        m = m.replace("<queries>", "<queries>" + inner, 1)
+    else:
+        m = m.replace("</manifest>", queries + "</manifest>", 1)
 mf.write_text(m, encoding="utf-8")
 print("Android ayarları uygulandı.")
 

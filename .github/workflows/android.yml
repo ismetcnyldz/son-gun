@@ -29,16 +29,36 @@ jobs:
           flutter --version
           flutter create --platforms=android --org com.yildiz --project-name son_gun .
           rm -f test/widget_test.dart
+
+      - name: Yayın imza anahtarı (GitHub Secrets'ta varsa)
+        env:
+          KS: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KP: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > android/app/upload.jks
+            printf "storePassword=%s\nkeyPassword=%s\nkeyAlias=upload\nstoreFile=upload.jks\n" "$KP" "$KP" > android/key.properties
+            echo "İmza anahtarı bulundu."
+          else
+            echo "İmza anahtarı yok: deneme imzasıyla derlenecek."
+          fi
           python3 tool/patch_android.py
 
-      - name: Paketleri indir
-        run: flutter pub get
+      - name: Paketleri indir ve simgeleri üret
+        run: |
+          flutter pub get
+          dart run flutter_launcher_icons
 
       - name: Testler
         run: flutter test
 
-      - name: APK derle
-        run: flutter build apk --release
+      - name: APK ve mağaza paketi (AAB) derle
+        env:
+          RC_ANDROID_KEY: ${{ secrets.RC_ANDROID_KEY }}
+        run: |
+          ARGS="--release --build-number=${{ github.run_number }} --dart-define=RC_ANDROID_KEY=$RC_ANDROID_KEY"
+          flutter build apk $ARGS
+          flutter build appbundle $ARGS
 
       - uses: actions/upload-artifact@v4
         with:
@@ -51,8 +71,9 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           cp build/app/outputs/flutter-apk/app-release.apk SonGun.apk
+          cp build/app/outputs/bundle/release/app-release.aab SonGun.aab
           gh release delete deneme --yes --cleanup-tag || true
-          gh release create deneme SonGun.apk --target "${{ github.sha }}" --prerelease \
+          gh release create deneme SonGun.apk SonGun.aab --target "${{ github.sha }}" --prerelease \
             --title "Son Gün - deneme sürümü" \
             --notes "Telefondan SonGun.apk dosyasına dokunup indir, sonra açıp kur. Android 'bilinmeyen kaynak' izni isteyebilir."
 
@@ -72,7 +93,9 @@ jobs:
           rm -f test/widget_test.dart
           python3 tool/patch_web.py
           flutter pub get
+          dart run flutter_launcher_icons
           flutter build web --release --base-href /son-gun/
+          cp -r site/yasal build/web/yasal
 
       - name: Mağaza ekran görüntüleri
         continue-on-error: true
@@ -98,3 +121,23 @@ jobs:
           git add -A
           git commit -q -m "Web deneme sürümü ${{ github.sha }}"
           git push -f "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" gh-pages
+
+  ios:
+    runs-on: macos-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: iPhone sürümünü derle (imzasız, kontrol için)
+        run: |
+          flutter create --platforms=ios --org com.yildiz --project-name son_gun .
+          rm -f test/widget_test.dart
+          python3 tool/patch_ios.py
+          flutter pub get
+          dart run flutter_launcher_icons
+          flutter build ios --release --no-codesign --build-number=${{ github.run_number }}

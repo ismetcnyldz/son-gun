@@ -8,12 +8,18 @@ const String appName = 'Son Gün';
 
 /// Destek e-postası (alan adı alınınca güncellenecek)
 const String supportEmail = 'destek@songun.app';
-const String appVersion = '0.3.0';
+const String appVersion = '1.0.0';
+
+/// Yasal sayfalar (alan adı alınınca güncellenecek)
+const String siteBase = 'https://ismetcnyldz.github.io/son-gun';
+const String privacyUrl = '$siteBase/yasal/gizlilik.html';
+const String termsUrl = '$siteBase/yasal/sartlar.html';
+const String kvkkUrl = '$siteBase/yasal/kvkk.html';
 
 /// Mağaza ekran görüntüsü modu (web, ?shots): deneme uyarılarını gizler
 final bool storeShots = kIsWeb && Uri.base.queryParameters.containsKey('shots');
 
-enum Kind { belge, garanti, kart, abonelik, diger }
+enum Kind { belge, garanti, kart, abonelik, cek, diger }
 
 extension KindText on Kind {
   String get label => switch (this) {
@@ -21,6 +27,7 @@ extension KindText on Kind {
         Kind.garanti => 'Garanti',
         Kind.kart => 'Kart son ödeme',
         Kind.abonelik => 'Abonelik',
+        Kind.cek => 'Çek / senet',
         Kind.diger => 'Diğer',
       };
 
@@ -29,11 +36,25 @@ extension KindText on Kind {
         Kind.garanti => 'GAR',
         Kind.kart => 'KART',
         Kind.abonelik => 'ABO',
+        Kind.cek => 'ÇEK',
         Kind.diger => 'DİĞ',
       };
 
   /// Her ay tekrarlayan türler (ayın belli günü)
   bool get monthly => this == Kind.kart || this == Kind.abonelik;
+
+  /// Kaç gün kala hatırlatılır (0 = son gün sabahı)
+  List<int> get offsets => switch (this) {
+        Kind.kart || Kind.abonelik => const [3, 1, 0],
+        Kind.cek => const [7, 3, 1, 0],
+        _ => const [30, 7, 1, 0],
+      };
+
+  String get reminderText => switch (this) {
+        Kind.kart || Kind.abonelik => '3 gün ve 1 gün kala, son gün sabahı',
+        Kind.cek => '7, 3 ve 1 gün kala, son gün sabahı',
+        _ => '30, 7 ve 1 gün kala, son gün sabahı',
+      };
 }
 
 class Item {
@@ -168,4 +189,11 @@ const presets = <Preset>[
   Preset('Spor salonu', Kind.abonelik),
   Preset('Kira', Kind.abonelik),
   Preset('Aidat', Kind.abonelik),
+  Preset('Disney+', Kind.abonelik),
+  Preset('Amazon Prime', Kind.abonelik),
+  Preset('iCloud+', Kind.abonelik),
+  Preset('Verilen çek', Kind.cek, 'Kime, çek no'),
+  Preset('Alınan çek', Kind.cek, 'Kimden, çek no'),
+  Preset('Senet ödemesi', Kind.cek, 'Kime / kimden'),
+  Preset('Kredi taksiti', Kind.cek, 'Banka'),
 ];

@@ -4,13 +4,15 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'billing.dart';
+
 class Entitlement extends ChangeNotifier {
   static const trialDays = 30;
   static const monthlyPrice = '₺49,99';
   static const yearlyPrice = '₺399';
 
-  /// Ödeme sistemi bağlı mı? Bağlanınca true olacak.
-  static const billingReady = false;
+  /// Ödeme sistemi bağlı mı? (mağaza anahtarı verilince true olur)
+  static bool get billingReady => Billing.ready;
 
   DateTime? trialStart;
   bool subscribed = false;
@@ -36,6 +38,14 @@ class Entitlement extends ChangeNotifier {
     trialStart ??= DateTime.now();
     final p = await SharedPreferences.getInstance();
     await p.setString('trial_start', trialStart!.toIso8601String());
+    notifyListeners();
+  }
+
+  Future<void> setSubscribed(bool v) async {
+    if (subscribed == v) return;
+    subscribed = v;
+    final p = await SharedPreferences.getInstance();
+    await p.setBool('subscribed', v);
     notifyListeners();
   }
 

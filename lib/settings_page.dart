@@ -6,10 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 
+import 'backup_file.dart';
 import 'entitlement.dart';
 import 'lock.dart';
 import 'main.dart';
 import 'models.dart';
+import 'notify.dart';
 import 'paywall.dart';
 import 'turkey.dart';
 
@@ -81,6 +83,39 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
+  Future<void> _pickTime() async {
+    final t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: Notifier.hour, minute: Notifier.minute),
+      helpText: 'Hatırlatmalar saat kaçta gelsin?',
+      builder: (ctx, child) => MediaQuery(data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true), child: child!),
+    );
+    if (t == null) return;
+    await Notifier.setTime(t.hour, t.minute, store.items);
+    if (mounted) setState(() {});
+    _toast('Hatırlatmalar artık ${Notifier.timeText}\'da gelecek.');
+  }
+
+  Future<void> _shareFile() async {
+    try {
+      await shareBackupFile();
+    } catch (_) {
+      _toast('Yedek dosyası oluşturulamadı.');
+    }
+  }
+
+  Future<void> _importFile() async {
+    try {
+      final n = await importBackupFile();
+      if (n == null) return;
+      _toast(n == 0 ? 'Yeni kayıt bulunamadı (hepsi zaten var).' : '$n kayıt geri yüklendi.');
+    } catch (_) {
+      _toast('Bu dosya bir Son Gün yedeği değil ya da bozuk.');
+    }
+  }
+
+  void _open(String url) => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+
   Future<void> _mail(String subject) async {
     final platform = kIsWeb ? 'Web' : Theme.of(context).platform.name;
     final body = '\n\n---\nUygulama: $appName $appVersion\nPlatform: $platform\nKayıt sayısı: ${store.items.length}';
@@ -124,6 +159,14 @@ class _SettingsPageState extends State<SettingsPage> {
               sub: 'Araç muayenesi, MTV ve emlak vergisi taksitleri',
               onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TurkeyCalendarPage())),
             ),
+            _label('Hatırlatmalar'),
+            _tile(
+              icon: Icons.schedule_rounded,
+              title: 'Bildirim saati',
+              sub: 'Hatırlatmalar her gün ${Notifier.timeText}\'da gelir',
+              trailing: Text(Notifier.timeText, style: display(20)),
+              onTap: _pickTime,
+            ),
             _label('Görünüm'),
             for (final (m, t, i) in [
               (ThemeMode.system, 'Telefonla aynı', Icons.brightness_auto_rounded),
@@ -159,13 +202,22 @@ class _SettingsPageState extends State<SettingsPage> {
                 ),
               ),
             _label('Yedekleme'),
-            _tile(icon: Icons.copy_all_rounded, title: 'Yedeği kopyala', sub: 'Bütün kayıtlar tek metin olarak panoya kopyalanır', onTap: _copyBackup),
-            _tile(icon: Icons.restore_rounded, title: 'Yedekten geri yükle', sub: 'Yeni telefonda kopyaladığın yedeği yapıştır', onTap: _restore),
+            _tile(
+              icon: Icons.ios_share_rounded,
+              title: 'Yedek dosyası kaydet',
+              sub: 'iCloud Drive, Google Drive, e-posta ya da WhatsApp\'a kaydet. Telefon kaybolursa buradan geri yüklersin.',
+              onTap: _shareFile,
+            ),
+            _tile(icon: Icons.file_open_rounded, title: 'Dosyadan geri yükle', sub: 'Kaydettiğin .songun yedek dosyasını seç', onTap: _importFile),
+            _tile(icon: Icons.copy_all_rounded, title: 'Yedeği metin olarak kopyala', sub: 'Notlara ya da mesaja yapıştırıp sakla', onTap: _copyBackup),
+            _tile(icon: Icons.content_paste_go_rounded, title: 'Metinden geri yükle', sub: 'Kopyaladığın yedeği yapıştır', onTap: _restore),
             _label('Destek'),
             _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Son Gün - Sorun bildirimi')),
             _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Son Gün - Öneri')),
             _label('Hakkında'),
-            _tile(icon: Icons.shield_moon_rounded, title: 'Gizlilik', sub: 'Kayıtların sadece bu cihazda tutulur. Kart numarası, şifre istenmez.'),
+            _tile(icon: Icons.shield_moon_rounded, title: 'Gizlilik politikası', sub: 'Kayıtların sadece bu cihazda tutulur. Kart numarası, şifre istenmez.', onTap: () => _open(privacyUrl)),
+            _tile(icon: Icons.gavel_rounded, title: 'KVKK aydınlatma metni', onTap: () => _open(kvkkUrl)),
+            _tile(icon: Icons.description_rounded, title: 'Kullanım ve abonelik şartları', onTap: () => _open(termsUrl)),
             Padding(
               padding: const EdgeInsets.only(top: 12),
               child: Center(child: Text('$appName · sürüm $appVersion', style: TextStyle(color: C.muted, fontSize: 12))),

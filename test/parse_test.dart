@@ -55,4 +55,21 @@ void main() {
     expect(renewLinkFor(Item(id: '1', kind: Kind.belge, title: 'Pasaport'))!.url, contains('nvi.gov.tr'));
     expect(renewLinkFor(Item(id: '1', kind: Kind.belge, title: 'Kasko')), isNull);
   });
+
+  test('abonelik iptal bağlantıları', () {
+    expect(renewLinkFor(Item(id: '1', kind: Kind.abonelik, title: 'Netflix'))!.url, contains('netflix'));
+    expect(renewLinkFor(Item(id: '1', kind: Kind.abonelik, title: 'Spor salonu')), isNull);
+    expect(renewLinkFor(Item(id: '1', kind: Kind.abonelik, title: 'Maximum kart')), isNull);
+  });
+
+  test('çek / senet hatırlatma günleri', () {
+    expect(Kind.cek.offsets, [7, 3, 1, 0]);
+    expect(Kind.cek.monthly, false);
+    expect(Kind.kart.offsets, [3, 1, 0]);
+  });
+
+  test('yedek eski sürümle uyumlu', () {
+    final it = Item.fromJson({'id': '1', 'kind': 'bilinmeyen', 'title': 'x'});
+    expect(it.kind, Kind.diger);
+  });
 }

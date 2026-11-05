@@ -11,6 +11,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import 'billing.dart';
+import 'calendar.dart';
 import 'entitlement.dart';
 import 'lock.dart';
 import 'models.dart';
@@ -63,6 +65,7 @@ Future<void> _start() async {
     await loadThemeMode();
     await loadLockSetting();
     await entitlement.load();
+    await Notifier.loadTime();
     if (!kIsWeb && entitlement.onboarded) await Notifier.requestPermission();
   } catch (_) {}
   try {
@@ -71,6 +74,15 @@ Future<void> _start() async {
     debugPrint('Kayıtlar yüklenemedi: $e');
   }
   runApp(SonGunApp());
+  // Ödeme sistemi açılışı geciktirmesin; abonelik durumu değişince hatırlatmalar yeniden kurulur
+  var wasActive = entitlement.active;
+  entitlement.addListener(() {
+    if (entitlement.active != wasActive) {
+      wasActive = entitlement.active;
+      store.refreshReminders();
+    }
+  });
+  unawaited(Billing.init());
 }
 
 // ---------------------------------------------------------------- Tasarım
@@ -241,6 +253,7 @@ IconData iconFor(Item it) {
     Kind.garanti => Icons.verified_user_rounded,
     Kind.kart => Icons.credit_card_rounded,
     Kind.abonelik => Icons.autorenew_rounded,
+    Kind.cek => Icons.receipt_long_rounded,
     Kind.diger => Icons.event_rounded,
   };
 }
@@ -250,6 +263,7 @@ IconData kindIcon(Kind k) => switch (k) {
       Kind.garanti => Icons.verified_user_rounded,
       Kind.kart => Icons.credit_card_rounded,
       Kind.abonelik => Icons.autorenew_rounded,
+      Kind.cek => Icons.receipt_long_rounded,
       Kind.diger => Icons.event_rounded,
     };
 
@@ -426,6 +440,14 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Kind? filter;
+  String query = '';
+  final searchCtl = TextEditingController();
+
+  @override
+  void dispose() {
+    searchCtl.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -433,7 +455,8 @@ class _HomePageState extends State<HomePage> {
       listenable: Listenable.merge([store, entitlement]),
       builder: (context, _) {
         final all = store.upcoming();
-        final list = filter == null ? all : all.where((e) => e.kind == filter).toList();
+        final found = store.search(query);
+        final list = filter == null ? found : found.where((e) => e.kind == filter).toList();
         final soon = all.where((e) => (e.daysLeft() ?? 999) <= 30).length;
         final week = all.where((e) => (e.daysLeft() ?? 999) <= 7).length;
         final monthPay = all
@@ -460,6 +483,28 @@ class _HomePageState extends State<HomePage> {
               _onboarding(),
             ] else ...[
               SectionTitle('Yaklaşanlar', trailing: Text('${list.length} kayıt', style: TextStyle(color: C.muted, fontWeight: FontWeight.w600))),
+              if (all.length >= 4)
+                Padding(
+                  padding: EdgeInsets.fromLTRB(16, 0, 16, 10),
+                  child: TextField(
+                    controller: searchCtl,
+                    onChanged: (v) => setState(() => query = v),
+                    textInputAction: TextInputAction.search,
+                    decoration: InputDecoration(
+                      hintText: 'Ara: plaka, banka, ürün…',
+                      prefixIcon: Icon(Icons.search_rounded, color: C.muted),
+                      suffixIcon: query.isEmpty
+                          ? null
+                          : IconButton(
+                              icon: Icon(Icons.close_rounded, color: C.muted),
+                              onPressed: () => setState(() {
+                                searchCtl.clear();
+                                query = '';
+                              }),
+                            ),
+                    ),
+                  ),
+                ),
               SizedBox(
                 height: 40,
                 child: ListView(
@@ -475,7 +520,7 @@ class _HomePageState extends State<HomePage> {
               if (list.isEmpty)
                 Padding(
                   padding: EdgeInsets.all(28),
-                  child: Center(child: Text('Bu kategoride kayıt yok.', style: TextStyle(color: C.muted))),
+                  child: Center(child: Text(query.isEmpty ? 'Bu kategoride kayıt yok.' : '"$query" ile eşleşen kayıt yok.', style: TextStyle(color: C.muted))),
                 ),
               for (final it in list) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: it)),
             ],
@@ -587,6 +632,7 @@ class _HomePageState extends State<HomePage> {
       (Kind.garanti, 'Garantiler'),
       (Kind.kart, 'Kartlar'),
       (Kind.abonelik, 'Abonelikler'),
+      (Kind.cek, 'Çek / senet'),
       (Kind.diger, 'Diğer'),
     ];
     return GridView.count(
@@ -602,7 +648,7 @@ class _HomePageState extends State<HomePage> {
             child: InkWell(
               borderRadius: BorderRadius.circular(18),
               onTap: () {
-                if (k.monthly) {
+                if (k.monthly || k == Kind.cek) {
                   widget.onTab(1);
                 } else {
                   setState(() => filter = k);
@@ -616,18 +662,6 @@ class _HomePageState extends State<HomePage> {
               ]),
             ),
           ),
-        Card(
-          child: InkWell(
-            borderRadius: BorderRadius.circular(18),
-            onTap: () => widget.onTab(2),
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              IconBox(icon: Icons.shield_rounded, color: C.red, size: 42),
-              SizedBox(height: 8),
-              Text('SMS Kontrol', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
-              Text('Sahte mesaj?', style: TextStyle(color: C.muted, fontSize: 11)),
-            ]),
-          ),
-        ),
       ],
     );
   }
@@ -772,13 +806,15 @@ class PaymentsPage extends StatelessWidget {
       listenable: store,
       builder: (context, _) {
         final cards = store.upcoming().where((e) => e.kind == Kind.kart).toList();
+        final cheques = store.upcoming().where((e) => e.kind == Kind.cek).toList();
+        final chequeTotal = cheques.where((e) => (e.daysLeft() ?? 999) <= 31).fold<double>(0, (a, e) => a + (e.amount ?? 0));
         final subs = store.upcoming().where((e) => e.kind == Kind.abonelik).toList();
         final total = store.monthlyTotal();
         final cardTotal = cards.fold<double>(0, (a, e) => a + (e.amount ?? 0));
         return ListView(
           padding: EdgeInsets.only(bottom: 110),
           children: [
-            PageHeader(title: 'Ödemeler', sub: 'Kartlar ve abonelikler'),
+            PageHeader(title: 'Ödemeler', sub: 'Kartlar, abonelikler, çekler'),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 16),
               child: Row(children: [
@@ -811,6 +847,15 @@ class PaymentsPage extends StatelessWidget {
             SectionTitle('Abonelikler', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.abonelik), icon: Icon(Icons.add_rounded, size: 18), label: Text('Abonelik ekle'))),
             if (subs.isEmpty) _Empty('Henüz abonelik eklenmedi.'),
             for (final s in subs) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: s)),
+            SectionTitle('Çek / senet', trailing: TextButton.icon(onPressed: () => openEditor(context, kind: Kind.cek), icon: Icon(Icons.add_rounded, size: 18), label: Text('Ekle'))),
+            if (cheques.isEmpty)
+              _Empty('Çek, senet ya da taksit ödemesi yok.')
+            else
+              Padding(
+                padding: EdgeInsets.fromLTRB(16, 0, 16, 6),
+                child: Text('31 gün içinde: ${fmtMoney(chequeTotal)}', style: TextStyle(color: C.muted, fontWeight: FontWeight.w700)),
+              ),
+            for (final c in cheques) Padding(padding: EdgeInsets.fromLTRB(16, 4, 16, 4), child: ItemCard(item: c)),
           ],
         );
       },
@@ -1053,6 +1098,17 @@ class _EditorPageState extends State<EditorPage> {
 
   void _toast(String t) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t), behavior: SnackBarBehavior.floating));
 
+  Future<void> _addCalendar() async {
+    if (title.text.trim().isEmpty) return _toast('Önce bir başlık yaz.');
+    final it = Item(id: '', kind: kind, title: title.text.trim(), note: note.text.trim(), date: kind.monthly ? null : date, day: kind.monthly ? day : null,
+        amount: double.tryParse(amount.text.replaceAll('.', '').replaceAll(',', '.').replaceAll('₺', '').trim()));
+    try {
+      await addToCalendar(it);
+    } catch (_) {
+      _toast('Takvim açılamadı.');
+    }
+  }
+
   Widget _label(String t) => Padding(
         padding: EdgeInsets.only(top: 20, bottom: 8),
         child: Text(t.toUpperCase(), style: GoogleFonts.manrope(fontSize: 11, letterSpacing: 1.1, fontWeight: FontWeight.w800, color: C.muted)),
@@ -1084,11 +1140,12 @@ class _EditorPageState extends State<EditorPage> {
             _photoCard(),
             _label('Ne ekliyorsun?'),
             GridView.count(
-              crossAxisCount: 5,
+              crossAxisCount: 3,
               shrinkWrap: true,
               physics: NeverScrollableScrollPhysics(),
               crossAxisSpacing: 6,
-              childAspectRatio: 0.78,
+              mainAxisSpacing: 6,
+              childAspectRatio: 1.45,
               children: [
                 for (final k in Kind.values)
                   GestureDetector(
@@ -1104,7 +1161,7 @@ class _EditorPageState extends State<EditorPage> {
                         Icon(kindIcon(k), color: kind == k ? C.onInk : C.accent, size: 22),
                         SizedBox(height: 6),
                         Text(
-                          k == Kind.kart ? 'Kart' : k.label,
+                          k == Kind.kart ? 'Kart ödemesi' : k.label,
                           textAlign: TextAlign.center,
                           style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, color: kind == k ? C.onInk : C.ink),
                         ),
@@ -1146,7 +1203,12 @@ class _EditorPageState extends State<EditorPage> {
             _label('Not'),
             TextField(
               controller: note,
-              decoration: InputDecoration(hintText: kind == Kind.kart ? 'Banka ve son 4 hane, örn. Akbank 4821' : 'Örn. plaka, ürün, kişi'),
+              decoration: InputDecoration(
+                  hintText: switch (kind) {
+                Kind.kart => 'Banka ve son 4 hane, örn. Akbank 4821',
+                Kind.cek => 'Kime / kimden, çek ya da senet no',
+                _ => 'Örn. plaka, ürün, kişi',
+              }),
             ),
             _label(kind == Kind.kart ? 'Ekstre tutarı' : 'Tutar'),
             TextField(
@@ -1163,7 +1225,7 @@ class _EditorPageState extends State<EditorPage> {
                 SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    kind.monthly ? 'Hatırlatma: 3 gün ve 1 gün kala, son gün sabahı.' : 'Hatırlatma: 30, 7 ve 1 gün kala, son gün sabahı.',
+                    'Hatırlatma: ${kind.reminderText} (${Notifier.timeText}).',
                     style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600),
                   ),
                 ),
@@ -1176,6 +1238,15 @@ class _EditorPageState extends State<EditorPage> {
                 icon: Icon(Icons.open_in_new_rounded, color: C.accent),
                 style: OutlinedButton.styleFrom(backgroundColor: C.card),
                 label: Text(link.label),
+              ),
+            ],
+            if (!kIsWeb && (kind.monthly ? day != null : date != null)) ...[
+              SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: _addCalendar,
+                icon: Icon(Icons.event_available_rounded, color: C.accent),
+                style: OutlinedButton.styleFrom(backgroundColor: C.card),
+                label: Text('Telefonun takvimine de ekle'),
               ),
             ],
             SizedBox(height: 20),

@@ -1,5 +1,6 @@
 // Telefon bildirimleri: son güne 30, 7, 1 gün kala ve son gün sabahı
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest_all.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -9,6 +10,29 @@ import 'models.dart';
 class Notifier {
   static final _plugin = FlutterLocalNotificationsPlugin();
   static bool _ready = false;
+
+  /// Bildirimlerin geleceği saat (varsayılan 10:00)
+  static int hour = 10;
+  static int minute = 0;
+
+  static Future<void> loadTime() async {
+    final p = await SharedPreferences.getInstance();
+    final t = p.getString('notify_time');
+    if (t != null && t.contains(':')) {
+      hour = int.tryParse(t.split(':')[0]) ?? 10;
+      minute = int.tryParse(t.split(':')[1]) ?? 0;
+    }
+  }
+
+  static Future<void> setTime(int h, int m, List<Item> items) async {
+    hour = h;
+    minute = m;
+    final p = await SharedPreferences.getInstance();
+    await p.setString('notify_time', '$h:$m');
+    await rescheduleAll(items);
+  }
+
+  static String get timeText => '${hour.toString().padLeft(2, '0')}:${minute.toString().padLeft(2, '0')}';
 
   static const _details = NotificationDetails(
     android: AndroidNotificationDetails(
@@ -25,7 +49,7 @@ class Notifier {
     tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
     await _plugin.initialize(
       const InitializationSettings(
-        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+        android: AndroidInitializationSettings('@drawable/ic_stat_notify'),
         iOS: DarwinInitializationSettings(
           requestAlertPermission: false,
           requestBadgePermission: false,
@@ -58,10 +82,10 @@ class Notifier {
     for (final it in items) {
       final due = it.nextDue();
       if (due == null) continue;
-      final offsets = it.kind.monthly ? const [3, 1, 0] : const [30, 7, 1, 0];
+      final offsets = it.kind.offsets;
       for (final off in offsets) {
         final d = due.subtract(Duration(days: off));
-        final when = tz.TZDateTime(tz.local, d.year, d.month, d.day, 10);
+        final when = tz.TZDateTime(tz.local, d.year, d.month, d.day, hour, minute);
         if (!when.isAfter(now)) continue;
         final body = off == 0
             ? 'Bugün son gün: ${fmtDate(due)}'

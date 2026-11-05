@@ -80,6 +80,13 @@ class Store extends ChangeNotifier {
     return addMany(list);
   }
 
+  /// Başlık ve notta arama (Türkçe küçük harfle)
+  List<Item> search(String q) {
+    final t = trLower(q.trim());
+    if (t.isEmpty) return upcoming();
+    return upcoming().where((e) => trLower('${e.title} ${e.note} ${e.kind.label}').contains(t)).toList();
+  }
+
   double monthlyTotal() => items
       .where((e) => e.kind == Kind.abonelik)
       .fold(0.0, (a, e) => a + (e.amount ?? 0));

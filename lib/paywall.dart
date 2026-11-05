@@ -1,6 +1,10 @@
 // Abonelik ekranı: 1 ay ücretsiz deneme
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+import 'billing.dart';
 
 import 'entitlement.dart';
 import 'main.dart';
@@ -17,19 +21,55 @@ class _PaywallPageState extends State<PaywallPage> {
   bool yearly = true;
   bool busy = false;
 
+  String get _yearly => Billing.price(true) ?? Entitlement.yearlyPrice;
+  String get _monthly => Billing.price(false) ?? Entitlement.monthlyPrice;
+
+  /// Deneme başlamadıysa: kartsız 30 gün deneme. Başladıysa: abone ol.
   Future<void> _start() async {
     setState(() => busy = true);
-    // Mağaza ödeme sistemi bağlanınca burada gerçek satın alma başlayacak.
-    await entitlement.startTrial();
-    await store.refreshReminders();
-    if (!mounted) return;
-    setState(() => busy = false);
-    Navigator.of(context).pop(true);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      behavior: SnackBarBehavior.floating,
-      content: Text('Deneme başladı: ${Entitlement.trialDays} gün boyunca her şey açık.'),
-    ));
+    try {
+      if (!entitlement.trialStarted) {
+        await entitlement.startTrial();
+        await store.refreshReminders();
+        if (!mounted) return;
+        Navigator.of(context).pop(true);
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          behavior: SnackBarBehavior.floating,
+          content: Text('Deneme başladı: ${Entitlement.trialDays} gün boyunca her şey açık.'),
+        ));
+        return;
+      }
+      if (!Entitlement.billingReady) {
+        _toast('Abonelik, uygulama mağazada yayınlanınca açılacak.');
+        return;
+      }
+      final ok = await Billing.buy(yearly);
+      await store.refreshReminders();
+      if (!mounted) return;
+      if (ok) {
+        Navigator.of(context).pop(true);
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(behavior: SnackBarBehavior.floating, content: Text('Teşekkürler! Aboneliğin aktif.')));
+      }
+    } catch (e) {
+      _toast('$e');
+    } finally {
+      if (mounted) setState(() => busy = false);
+    }
   }
+
+  Future<void> _restore() async {
+    if (!Entitlement.billingReady) return _toast('Satın alımlar, uygulama mağazada yayınlanınca geri yüklenebilecek.');
+    try {
+      final ok = await Billing.restore();
+      await store.refreshReminders();
+      _toast(ok ? 'Aboneliğin geri yüklendi.' : 'Bu hesapta aktif abonelik bulunamadı.');
+      if (ok && mounted) setState(() {});
+    } catch (e) {
+      _toast('$e');
+    }
+  }
+
+  void _open(String url) => launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
 
   void _toast(String t) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(t), behavior: SnackBarBehavior.floating));
 
@@ -84,6 +124,8 @@ class _PaywallPageState extends State<PaywallPage> {
   @override
   Widget build(BuildContext context) {
     final expired = entitlement.trialStarted && !entitlement.active;
+    final started = entitlement.trialStarted;
+    if (entitlement.subscribed) return _thanks();
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -107,9 +149,9 @@ class _PaywallPageState extends State<PaywallPage> {
                     gradient: const LinearGradient(colors: [C.heroA, C.heroB], begin: Alignment.topLeft, end: Alignment.bottomRight),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(expired ? 'Deneme süren bitti' : 'İlk ay bizden', style: GoogleFonts.manrope(color: Colors.white70, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 1)),
+                    Text(expired ? 'Deneme süren bitti' : started ? 'Deneme: ${entitlement.trialDaysLeft} gün kaldı' : 'İlk ay bizden', style: GoogleFonts.manrope(color: Colors.white70, fontWeight: FontWeight.w800, fontSize: 12, letterSpacing: 1)),
                     const SizedBox(height: 8),
-                    Text(expired ? 'Hatırlatmalar durdu. Devam etmek için abone ol.' : '${Entitlement.trialDays} gün ücretsiz,\nsonra istersen devam.',
+                    Text(expired ? 'Hatırlatmalar durdu. Devam etmek için abone ol.' : started ? 'Şimdi abone ol,\nhiçbir hatırlatmayı kaçırma.' : '${Entitlement.trialDays} gün ücretsiz,\nkart bilgisi gerekmez.',
                         style: display(28, color: Colors.white)),
                   ]),
                 ),
@@ -120,18 +162,23 @@ class _PaywallPageState extends State<PaywallPage> {
                 _feature(Icons.auto_awesome_rounded, 'Türkiye takvimi: muayene, MTV, emlak vergisi'),
                 _feature(Icons.lock_rounded, 'Uygulama kilidi ve yedekleme'),
                 const SizedBox(height: 8),
-                _plan(isYearly: true, title: 'Yıllık', price: Entitlement.yearlyPrice, sub: 'Ayda ₺33\'e gelir · ilk ay ücretsiz', badge: 'En avantajlı'),
-                _plan(isYearly: false, title: 'Aylık', price: Entitlement.monthlyPrice, sub: 'İlk ay ücretsiz'),
+                _plan(isYearly: true, title: 'Yıllık', price: _yearly, sub: 'Aylığa göre %33 daha ucuz', badge: 'En avantajlı'),
+                _plan(isYearly: false, title: 'Aylık', price: _monthly, sub: 'İstediğin zaman iptal et'),
                 const SizedBox(height: 6),
                 FilledButton(
                   onPressed: busy ? null : _start,
-                  child: Text(expired ? 'Abone ol' : '${Entitlement.trialDays} gün ücretsiz başla'),
+                  child: busy
+                      ? SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2.4, color: C.onAccent))
+                      : Text(started ? 'Abone ol · ${yearly ? '$_yearly / yıl' : '$_monthly / ay'}' : '${Entitlement.trialDays} gün ücretsiz başla'),
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Deneme bitmeden istediğin an iptal edersen hiçbir ücret alınmaz. Abonelik, iptal edilmedikçe '
-                  '${yearly ? 'yıllık ${Entitlement.yearlyPrice}' : 'aylık ${Entitlement.monthlyPrice}'} olarak otomatik yenilenir. '
-                  'Abone olmasan da kayıtların silinmez.',
+                  started
+                      ? 'Abonelik, iptal edilmedikçe ${yearly ? 'yıllık $_yearly' : 'aylık $_monthly'} olarak otomatik yenilenir. '
+                          'Yenilemeden en az 24 saat önce App Store / Google Play hesap ayarlarından iptal edebilirsin. '
+                          'Abone olmasan da kayıtların silinmez.'
+                      : 'Deneme için kart ya da ödeme bilgisi istenmez. ${Entitlement.trialDays} gün sonra devam etmek istersen '
+                          '${yearly ? 'yıllık $_yearly' : 'aylık $_monthly'} ile abone olabilirsin. Abone olmasan da kayıtların silinmez.',
                   textAlign: TextAlign.center,
                   style: TextStyle(color: C.muted, fontSize: 12, height: 1.4),
                 ),
@@ -141,7 +188,12 @@ class _PaywallPageState extends State<PaywallPage> {
                 ],
                 const SizedBox(height: 6),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  TextButton(onPressed: () => _toast('Satın alımlar, uygulama mağazada yayınlanınca geri yüklenebilecek.'), child: const Text('Satın alımları geri yükle')),
+                  TextButton(onPressed: _restore, child: const Text('Satın alımları geri yükle')),
+                ]),
+                Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  TextButton(onPressed: () => _open(termsUrl), child: Text('Kullanım şartları', style: TextStyle(color: C.muted, fontSize: 12))),
+                  Text('·', style: TextStyle(color: C.muted)),
+                  TextButton(onPressed: () => _open(privacyUrl), child: Text('Gizlilik', style: TextStyle(color: C.muted, fontSize: 12))),
                 ]),
               ],
             ),
@@ -150,4 +202,28 @@ class _PaywallPageState extends State<PaywallPage> {
       ),
     );
   }
+
+  Widget _thanks() => Scaffold(
+        appBar: AppBar(),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              IconBox(icon: Icons.workspace_premium_rounded, color: C.accent, size: 72),
+              const SizedBox(height: 18),
+              Text('Aboneliğin aktif', style: display(30)),
+              const SizedBox(height: 10),
+              Text('Bütün özellikler açık. Aboneliğini App Store ya da Google Play hesap ayarlarından yönetebilirsin.',
+                  textAlign: TextAlign.center, style: TextStyle(color: C.muted, height: 1.4)),
+              const SizedBox(height: 18),
+              OutlinedButton(
+                onPressed: () => _open(defaultTargetPlatform == TargetPlatform.iOS
+                    ? 'https://apps.apple.com/account/subscriptions'
+                    : 'https://play.google.com/store/account/subscriptions'),
+                child: const Text('Aboneliği yönet'),
+              ),
+            ]),
+          ),
+        ),
+      );
 }
