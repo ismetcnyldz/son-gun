@@ -1,0 +1,17 @@
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.idea/
+*.iml
+.metadata
+android/
+ios/
+web/
+linux/
+macos/
+windows/
+pubspec.lock

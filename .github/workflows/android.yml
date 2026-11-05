@@ -1,0 +1,44 @@
+name: Android APK
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Android proje iskeletini oluştur
+        run: |
+          flutter --version
+          flutter create --platforms=android --org com.yildiz --project-name son_gun .
+          rm -f test/widget_test.dart
+          python3 tool/patch_android.py
+
+      - name: Paketleri indir
+        run: flutter pub get
+
+      - name: Testler
+        run: flutter test
+
+      - name: APK derle
+        run: flutter build apk --release
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: son-gun-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30

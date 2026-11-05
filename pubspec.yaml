@@ -1,0 +1,26 @@
+name: son_gun
+description: Belge, garanti ve ödeme son tarihlerini saklayıp zamanında hatırlatan uygulama.
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: '>=3.4.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  shared_preferences: ^2.3.2
+  flutter_local_notifications: ^18.0.1
+  timezone: ^0.9.4
+  image_picker: ^1.1.2
+  google_mlkit_text_recognition: ^0.14.0
+  path_provider: ^2.1.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
