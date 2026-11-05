@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart' show kIsWeb;
@@ -16,7 +17,23 @@ import 'store.dart';
 final store = Store();
 
 Future<void> main() async {
+  await runZonedGuarded(_start, (e, st) {
+    debugPrint('HATA: $e\n$st');
+    runApp(MaterialApp(home: Scaffold(body: SafeArea(child: SingleChildScrollView(
+      padding: const EdgeInsets.all(16),
+      child: SelectableText('Uygulama açılırken hata oluştu:\n\n$e\n\n$st'),
+    )))));
+  });
+}
+
+Future<void> _start() async {
   WidgetsFlutterBinding.ensureInitialized();
+  ErrorWidget.builder = (d) => Material(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: SelectableText('Ekran hatası:\n${d.exceptionAsString()}\n\n${d.stack}', style: const TextStyle(fontSize: 12)),
+        ),
+      );
   if (!kIsWeb) {
     try {
       await Notifier.init();

@@ -72,7 +72,7 @@ jobs:
           rm -f test/widget_test.dart
           python3 tool/patch_web.py
           flutter pub get
-          flutter build web --release --base-href /son-gun/
+          flutter build web --profile --base-href /son-gun/
 
       - name: GitHub Pages'e yayınla (gh-pages dalı)
         env:
