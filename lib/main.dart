@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -497,11 +498,22 @@ class _EditorPageState extends State<EditorPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // Fotoğraf
+          // Fotoğraf (web deneme sürümünde yok)
+          if (kIsWeb)
+            const Card(
+              child: Padding(
+                padding: EdgeInsets.all(14),
+                child: Text(
+                  'Bu web deneme sürümü. Fotoğraftan otomatik okuma ve hatırlatma bildirimleri telefon uygulamasında çalışır; burada bilgileri elle girebilirsin.',
+                  style: TextStyle(fontSize: 13),
+                ),
+              ),
+            )
+          else ...[
           Card(
             clipBehavior: Clip.antiAlias,
             child: Column(children: [
-              if (photo != null && File(photo!).existsSync())
+              if (!kIsWeb && photo != null && File(photo!).existsSync())
                 Image.file(File(photo!), height: 180, width: double.infinity, fit: BoxFit.cover),
               Padding(
                 padding: const EdgeInsets.all(12),
@@ -529,6 +541,7 @@ class _EditorPageState extends State<EditorPage> {
           ),
           const SizedBox(height: 6),
           const Text('Poliçe, ekstre, fatura ya da garanti belgesinin fotoğrafını çek; tarih otomatik okunur.', style: TextStyle(fontSize: 13)),
+          ],
           const SizedBox(height: 16),
           Text('Tür', style: Theme.of(context).textTheme.titleMedium),
           const SizedBox(height: 6),
