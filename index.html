@@ -1,0 +1,319 @@
+<!doctype html>
+<html lang="tr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dürt</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Belgelerin, garantilerin ve ödemelerin son günü artık kaçmıyor.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: landing page. Hero split (copy + phone stack), proof strip, 3-step "how it works", feature grid, SMS check spotlight, privacy band, pricing, FAQ, final CTA. Paper + deep teal, urgency red/amber used only on countdown numbers. */
+:root{
+  --bg:#F3F1EC; --paper:#FFFDF9; --paper2:#EBE7DF; --ink:#22262B; --muted:#62666C; --line:#DDD8CE;
+  --teal:#2F5D62; --teal2:#1C3B3F; --tealSoft:#DCE8E6; --red:#C2412D; --amber:#C98A12; --green:#3C7D4F;
+  --display:"Fraunces",Georgia,serif; --body:"Manrope","Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15181B;--paper:#1F2327;--paper2:#2A2F34;--ink:#ECE8E0;--muted:#A3A7AD;--line:#353A40;--teal:#7DC1C6;--teal2:#2F5D62;--tealSoft:#22373A;--red:#EF8069;--amber:#E9B85A;--green:#82C795;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15181B;--paper:#1F2327;--paper2:#2A2F34;--ink:#ECE8E0;--muted:#A3A7AD;--line:#353A40;--teal:#7DC1C6;--teal2:#2F5D62;--tealSoft:#22373A;--red:#EF8069;--amber:#E9B85A;--green:#82C795;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body)}
+.wrap{max-width:1120px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+a{color:inherit}
+h1,h2,h3{font-family:var(--display);font-weight:700;letter-spacing:-.02em;line-height:1.05;margin:0;text-wrap:balance}
+.eyebrow{font-size:12px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--teal)}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:14px;padding:14px 20px;font:800 15px var(--body);text-decoration:none;border:1px solid transparent;cursor:pointer}
+.btn.dark{background:var(--ink);color:var(--bg)}
+.btn.ghost{background:var(--paper);border-color:var(--line);color:var(--ink)}
+.btn small{display:block;font-weight:600;font-size:11px;opacity:.75;line-height:1.1}
+.btn .lab{display:flex;flex-direction:column;line-height:1.15;text-align:left}
+.btn:focus-visible{outline:3px solid var(--amber);outline-offset:3px}
+/* nav */
+nav.top{display:flex;align-items:center;justify-content:space-between;padding-block:18px}
+.logo{display:flex;align-items:center;gap:10px;font:700 22px var(--display)}
+.logo i{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2F5D62,#1C3B3F);display:grid;place-items:center;color:#fff;font:700 15px var(--display);font-style:normal}
+nav.top .links{display:flex;gap:22px;font-weight:700;font-size:14px}
+nav.top .links a{text-decoration:none;color:var(--muted)}
+@media(max-width:720px){nav.top .links{display:none}}
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;padding-block:28px 64px}
+@media(max-width:900px){.hero{grid-template-columns:1fr;padding-bottom:40px}}
+.hero h1{font-size:clamp(42px,6.4vw,78px)}
+.hero h1 em{font-style:italic;color:var(--teal)}
+.hero p.lead{font-size:clamp(17px,1.6vw,20px);color:var(--muted);max-width:34ch;margin:22px 0 28px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.trust{display:flex;gap:18px;flex-wrap:wrap;margin-top:26px;font-size:13px;font-weight:700;color:var(--muted)}
+.trust span{display:flex;align-items:center;gap:6px}
+.trust svg{width:16px;height:16px;flex:none}
+/* phones */
+.stage{position:relative;height:620px;display:flex;justify-content:center}
+@media(max-width:900px){.stage{height:auto;padding-block:10px 0}}
+.phone{width:290px;max-width:100%;aspect-ratio:290/600;border-radius:44px;background:#0E1012;padding:11px;box-shadow:0 40px 80px -30px rgba(20,40,45,.45),0 0 0 1px rgba(255,255,255,.06) inset;position:relative}
+.phone::before{content:"";position:absolute;top:20px;left:50%;transform:translateX(-50%);width:84px;height:24px;border-radius:20px;background:#000;z-index:3}
+.screen{width:100%;height:100%;border-radius:34px;overflow:hidden;background:#F3F1EC;color:#22262B;font-family:var(--body);position:relative}
+.phone.back{position:absolute;right:-6px;top:70px;transform:rotate(6deg) scale(.86);opacity:.97}
+.phone.front{position:relative;z-index:2;transform:rotate(-3deg);margin-right:120px}
+@media(max-width:900px){.phone.back{display:none}.phone.front{margin-right:0;transform:none}}
+/* in-app mini UI (fixed light colors, it is a picture of the app) */
+.ui{padding:52px 14px 0;display:flex;flex-direction:column;gap:9px}
+.ui .date{font-size:8px;font-weight:800;letter-spacing:.12em;color:#6B6F75}
+.ui .ttl{font:700 24px var(--display);color:#22262B;margin-top:-4px}
+.ui .heroc{border-radius:18px;padding:14px;background:linear-gradient(135deg,#2F5D62,#1C3B3F);color:#fff;display:flex;justify-content:space-between;align-items:center;box-shadow:0 10px 20px -10px rgba(47,93,98,.6)}
+.ui .heroc b{font:700 36px var(--display);display:block;line-height:1}
+.ui .heroc span{font-size:10px;opacity:.9;font-weight:600}
+.ui .heroc .pill{display:inline-block;margin-top:6px;background:rgba(255,255,255,.16);border-radius:99px;padding:2px 8px;font-size:9px;font-weight:800;opacity:1}
+.ui .bell{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.ui .stats{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.ui .stat{background:#FFFDF9;border:1px solid #DDD8CE;border-radius:14px;padding:9px}
+.ui .stat b{font:700 15px var(--display);display:block}
+.ui .stat span{font-size:8.5px;color:#6B6F75;font-weight:600}
+.ui .sec{font:600 14px var(--display);margin-top:3px}
+.ui .it{background:#FFFDF9;border:1px solid #DDD8CE;border-radius:14px;padding:9px 10px 9px 12px;display:grid;grid-template-columns:28px 1fr auto;gap:9px;align-items:center;position:relative;overflow:hidden}
+.ui .it::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--c,transparent)}
+.ui .ico{width:28px;height:28px;border-radius:9px;display:grid;place-items:center;background:color-mix(in srgb,var(--c,#2F5D62) 14%,transparent)}
+.ui .ico svg{width:15px;height:15px;fill:var(--c,#2F5D62)}
+.ui .it b{display:block;font-size:11px;font-weight:800;color:#22262B}
+.ui .it small{font-size:8.5px;color:#6B6F75}
+.ui .d{text-align:right}
+.ui .d b{font:700 20px var(--display);color:var(--c,#3C7D4F);line-height:1}
+.ui .d small{font-size:7.5px}
+.ui .nav{position:absolute;left:0;right:0;bottom:0;height:56px;background:#FFFDF9;border-top:1px solid #DDD8CE;display:flex;justify-content:space-around;align-items:center;font-size:8px;font-weight:800;color:#6B6F75}
+.ui .nav span:first-child{color:#22262B}
+/* SMS screen */
+.sms{padding:52px 14px 0;display:flex;flex-direction:column;gap:10px}
+.bubble{background:#E9E9EB;border-radius:16px 16px 16px 4px;padding:10px 12px;font-size:10.5px;line-height:1.4;color:#111}
+.bubble u{color:#2F5D62}
+.verdict{border:1px solid rgba(194,65,45,.5);background:rgba(194,65,45,.07);border-radius:16px;padding:12px}
+.verdict h4{margin:0 0 6px;font:700 16px var(--display);color:#C2412D}
+.verdict li{font-size:9.5px;margin-bottom:3px}
+.verdict ul{margin:0;padding-left:14px}
+/* strip */
+.strip{border-block:1px solid var(--line);background:var(--paper)}
+.strip .wrap{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;padding-block:22px}
+@media(max-width:720px){.strip .wrap{grid-template-columns:repeat(2,1fr)}}
+.strip b{display:block;font:700 30px var(--display)}
+.strip span{font-size:13px;color:var(--muted);font-weight:600}
+section{padding-block:80px}
+@media(max-width:720px){section{padding-block:56px}}
+.head{max-width:640px;margin-bottom:38px}
+.head h2{font-size:clamp(32px,4.4vw,52px);margin-top:10px}
+.head p{color:var(--muted);font-size:18px;margin:14px 0 0}
+/* steps */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:820px){.steps{grid-template-columns:1fr}}
+.step{background:var(--paper);border:1px solid var(--line);border-radius:22px;padding:26px;display:flex;flex-direction:column;gap:10px}
+.step .n{font:700 46px var(--display);color:var(--teal);line-height:1}
+.step h3{font-size:24px}
+.step p{margin:0;color:var(--muted)}
+/* features */
+.feats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.feats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:560px){.feats{grid-template-columns:1fr}}
+.feat{border-radius:20px;padding:22px;background:var(--paper);border:1px solid var(--line)}
+.feat .fi{width:44px;height:44px;border-radius:13px;background:var(--tealSoft);display:grid;place-items:center;margin-bottom:14px}
+.feat .fi svg{width:22px;height:22px;fill:var(--teal)}
+.feat h3{font-size:21px;margin-bottom:6px}
+.feat p{margin:0;color:var(--muted);font-size:15px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+.tags span{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--paper2)}
+/* spotlight */
+.spot{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+@media(max-width:900px){.spot{grid-template-columns:1fr}}
+.spot ul{list-style:none;padding:0;margin:22px 0 0;display:flex;flex-direction:column;gap:12px}
+.spot li{display:flex;gap:12px;align-items:flex-start}
+.spot li i{flex:none;width:26px;height:26px;border-radius:8px;background:var(--tealSoft);display:grid;place-items:center;font-style:normal;font-weight:800;color:var(--teal);font-size:13px}
+/* privacy band */
+.band{background:linear-gradient(135deg,#2F5D62,#1C3B3F);color:#F3F1EC;border-radius:28px;padding:48px;display:grid;grid-template-columns:1.1fr .9fr;gap:30px;align-items:center}
+@media(max-width:820px){.band{grid-template-columns:1fr;padding:30px}}
+.band h2{font-size:clamp(30px,4vw,46px);color:#fff}
+.band p{color:rgba(255,255,255,.82);margin:14px 0 0}
+.band ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.band li{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:12px 14px;font-weight:700;font-size:15px}
+/* pricing */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.plans{grid-template-columns:1fr}}
+.plan{border-radius:22px;padding:26px;background:var(--paper);border:1px solid var(--line);display:flex;flex-direction:column;gap:14px}
+.plan.best{border:2px solid var(--teal);position:relative}
+.plan.best::after{content:"En çok tercih edilen";position:absolute;top:-12px;left:24px;background:var(--teal);color:var(--bg);font-size:11px;font-weight:800;padding:3px 10px;border-radius:99px}
+.plan h3{font-size:24px}
+.price{font:700 40px var(--display)}
+.price small{font:600 14px var(--body);color:var(--muted)}
+.plan ul{margin:0;padding-left:18px;color:var(--muted);font-size:15px;display:flex;flex-direction:column;gap:6px}
+.note{font-size:13px;color:var(--muted);margin-top:14px}
+/* faq */
+.faq{max-width:780px}
+details{border-bottom:1px solid var(--line);padding-block:18px}
+summary{cursor:pointer;font-weight:800;font-size:17px;list-style:none;display:flex;justify-content:space-between;gap:16px}
+summary::after{content:"+";font:700 22px var(--display);color:var(--teal)}
+details[open] summary::after{content:"–"}
+details p{color:var(--muted);margin:10px 0 0}
+/* final */
+.final{text-align:center;padding-block:90px}
+.final h2{font-size:clamp(36px,5.6vw,68px);max-width:16ch;margin:0 auto}
+.final p{color:var(--muted);font-size:18px;margin:18px auto 30px;max-width:44ch}
+.final .ctas{justify-content:center}
+footer{border-top:1px solid var(--line);padding-block:28px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{text-decoration:none;font-weight:700}
+@media (prefers-reduced-motion:no-preference){
+  .phone.front{animation:float 6s ease-in-out infinite}
+  @keyframes float{50%{transform:rotate(-3deg) translateY(-8px)}}
+}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:700;font-size:14px;z-index:10;max-width:90vw}
+</style>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7zm2.2-1h9.6l-1-3H8.2l-1 3zM7.5 15a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6zm2 2v2h14V8H5zm0 5v5h14v-5H5zm2 2h5v2H7v-2z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3zm-1 13.6l5.7-5.7-1.4-1.4L11 12.8 8.7 10.5l-1.4 1.4 3.7 3.7z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-2 6v8l6-4-6-4z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h10V5H7zm4 14v1h2v-1h-2z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 4h5v2H6v3H4V4zm11 0h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm14 0h2v5h-5v-2h3v-3zM7 11h10v2H7v-2z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2zm7-6V11a7 7 0 0 0-5.5-6.8V3a1.5 1.5 0 0 0-3 0v1.2A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z"/></symbol>
+  <symbol id="i-wallet" viewBox="0 0 24 24"><path d="M3 7a3 3 0 0 1 3-3h12v3h1a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a3 3 0 0 1-3-3V7zm3-1a1 1 0 0 0 0 2h10V6H6zm11 7a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1zm2 0h6V7a3 3 0 0 0-6 0v3z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14.2l5 5 11-11-1.4-1.4z"/></symbol>
+</svg>
+
+<div class="wrap">
+  <nav class="top">
+    <div class="logo"><i>D</i>Dürt</div>
+    <div class="links"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#sss">Sorular</a></div>
+    <a class="btn dark" href="#indir" style="padding:10px 16px;font-size:14px">İndir</a>
+  </nav>
+
+  <header class="hero">
+    <div>
+      <div class="eyebrow">Belgeler · Garantiler · Ödemeler</div>
+      <h1 style="margin-top:14px">Son günü sen unut, <em>Dürt</em> unutmaz.</h1>
+      <p class="lead">Trafik sigortası, muayene, DASK, pasaport, garanti belgeleri, kart son ödeme günleri… Fotoğrafını çek; Dürt tarihi okur, zamanı gelince hatırlatır.</p>
+      <div class="ctas" id="indir">
+        <a class="btn dark" href="#" data-soon><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><use href="#i-phone"/></svg><span class="lab"><small>Yakında</small>App Store</span></a>
+        <a class="btn dark" href="#" data-soon><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><use href="#i-play"/></svg><span class="lab"><small>Yakında</small>Google Play</span></a>
+        <a class="btn ghost" href="/uygulama/">Tarayıcıda dene</a>
+      </div>
+      <div class="trust">
+        <span><svg fill="currentColor"><use href="#i-check"/></svg>1 ay ücretsiz</span>
+        <span><svg fill="currentColor"><use href="#i-check"/></svg>Reklamsız</span>
+        <span><svg fill="currentColor"><use href="#i-check"/></svg>Kart numarası istemez</span>
+        <span><svg fill="currentColor"><use href="#i-check"/></svg>Veriler telefonunda</span>
+      </div>
+    </div>
+
+    <div class="stage" aria-label="Uygulama ekranları">
+      <div class="phone back" aria-hidden="true"><div class="screen">
+        <div class="sms">
+          <div style="font:700 19px var(--display)">Bu SMS sahte mi?</div>
+          <div class="bubble">Sayın vatandaş, hakkınızda icra takibi başlatılmıştır. 24 saat içinde ödeme yapınız: <u>e-devlet-icra-odeme.com</u></div>
+          <div class="verdict"><h4>Büyük ihtimalle dolandırıcılık</h4>
+            <ul><li>Link resmi bir adrese gitmiyor (.gov.tr değil)</li><li>Korkutucu konu: icra takibi</li><li>Acele ettiriyor: "24 saat"</li><li>Senden ödeme istiyor</li></ul></div>
+          <div style="font-size:9.5px;font-weight:800;color:#22262B">Linke tıklama. Borcunu e-Devlet'ten kendin kontrol et.</div>
+        </div>
+        <div class="ui"><div class="nav"><span>Ana sayfa</span><span>Ödemeler</span><span style="color:#22262B">SMS Kontrol</span></div></div>
+      </div></div>
+
+      <div class="phone front"><div class="screen">
+        <div class="ui">
+          <div class="date">5 KASIM PERŞEMBE</div>
+          <div class="ttl">Dürt</div>
+          <div class="heroc"><div><b>3</b><span>kaydın süresi 30 gün içinde doluyor</span><br><span class="pill">2 tanesi bu hafta</span></div><div class="bell"><svg width="18" height="18" fill="#fff"><use href="#i-bell"/></svg></div></div>
+          <div class="stats"><div class="stat"><b>₺8.689</b><span>31 gün içinde ödenecek</span></div><div class="stat"><b>12</b><span>Kayıtlı belge ve ödeme</span></div></div>
+          <div class="sec">Yaklaşanlar</div>
+          <div class="it" style="--c:#C2412D"><span class="ico"><svg><use href="#i-card"/></svg></span><span><b>Kredi kartı</b><small>Akbank 4821 · ₺8.460</small></span><span class="d"><b>3</b><small>gün kaldı</small></span></div>
+          <div class="it" style="--c:#C2412D"><span class="ico"><svg><use href="#i-car"/></svg></span><span><b>Trafik sigortası</b><small>34 ABC 123 · 9 Kasım</small></span><span class="d"><b>4</b><small>gün kaldı</small></span></div>
+          <div class="it" style="--c:#C98A12"><span class="ico"><svg><use href="#i-car"/></svg></span><span><b>Araç muayenesi</b><small>TÜVTÜRK · 23 Kasım</small></span><span class="d"><b>18</b><small>gün kaldı</small></span></div>
+          <div class="it"><span class="ico"><svg><use href="#i-shield"/></svg></span><span><b>Telefon garantisi</b><small>Fatura kayıtlı</small></span><span class="d"><b>319</b><small>gün kaldı</small></span></div>
+          <div class="nav"><span>Ana sayfa</span><span>Ödemeler</span><span>SMS Kontrol</span></div>
+        </div>
+      </div></div>
+    </div>
+  </header>
+</div>
+
+<div class="strip"><div class="wrap">
+  <div><b>3 sn</b><span>Fotoğraftan tarih okuma</span></div>
+  <div><b>30·7·1</b><span>Gün kala hatırlatma</span></div>
+  <div><b>25+</b><span>Hazır Türkiye belgesi</span></div>
+  <div><b>0</b><span>Reklam, satılan veri</span></div>
+</div></div>
+
+<section id="nasil"><div class="wrap">
+  <div class="head"><div class="eyebrow">Nasıl çalışır</div><h2>Üç adım. Sonra aklından çıkarabilirsin.</h2></div>
+  <div class="steps">
+    <div class="step"><span class="n">1</span><h3>Fotoğrafını çek</h3><p>Poliçe, ekstre, garanti belgesi ya da fatura. Elle yazmak da serbest.</p></div>
+    <div class="step"><span class="n">2</span><h3>Tarih kendiliğinden okunur</h3><p>Dürt belgenin türünü ve son tarihini telefonunda, internete göndermeden okur.</p></div>
+    <div class="step"><span class="n">3</span><h3>Zamanında hatırlatılır</h3><p>30, 7 ve 1 gün kala, son gün sabahı seni dürter. Saatini sen seçersin.</p></div>
+  </div>
+</div></section>
+
+<section id="ozellikler" style="padding-top:0"><div class="wrap">
+  <div class="head"><div class="eyebrow">Özellikler</div><h2>Hayatındaki bütün son tarihler tek yerde.</h2><p>Türkiye'deki belgeler için hazırlandı: muayene, MTV, DASK ve trafik sigortası hazır geliyor.</p></div>
+  <div class="feats">
+    <div class="feat"><div class="fi"><svg><use href="#i-car"/></svg></div><h3>Araç</h3><p>Trafik sigortası, kasko, muayene, MTV taksitleri tek ekranda.</p><div class="tags"><span>Trafik sigortası</span><span>Kasko</span><span>Muayene</span><span>MTV</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-home"/></svg></div><h3>Ev ve kimlik</h3><p>DASK, konut sigortası, kira sözleşmesi, pasaport ve ehliyet.</p><div class="tags"><span>DASK</span><span>Pasaport</span><span>Ehliyet</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-shield"/></svg></div><h3>Garantiler</h3><p>Fatura ve garanti belgesi fotoğrafıyla saklanır. Ürün bozulunca belge elinin altında.</p><div class="tags"><span>Telefon</span><span>Beyaz eşya</span><span>Elektronik</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-card"/></svg></div><h3>Kart son ödeme</h3><p>Her kartın son ödeme günü ve ekstre tutarı. Gecikme faizine son.</p><div class="tags"><span>Ekstre okuma</span><span>Aylık hatırlatma</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-wallet"/></svg></div><h3>Abonelikler</h3><p>Netflix'ten spor salonuna, aylık ve yıllık ne ödediğini gör.</p><div class="tags"><span>Aylık toplam</span><span>Yıllık toplam</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-wallet"/></svg></div><h3>Çek, senet, taksit</h3><p>Verdiğin ve aldığın çeklerin, senetlerin, kredi taksitlerinin vadesi 7, 3 ve 1 gün kala.</p><div class="tags"><span>Çek</span><span>Senet</span><span>Kredi taksiti</span></div></div>
+    <div class="feat"><div class="fi"><svg><use href="#i-scan"/></svg></div><h3>Sahte SMS kontrolü</h3><p>"İcra takibi", "HGS borcu" mesajlarını yapıştır; sahte mi, nedenleriyle söylesin.</p><div class="tags"><span>Linke tıklamadan</span><span>Ücretsiz</span></div></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap spot">
+  <div>
+    <div class="eyebrow">Neden Dürt</div>
+    <h2 style="font-size:clamp(32px,4.4vw,50px);margin-top:10px">Bir unutkanlığın bedeli, uygulamanın kendisinden pahalı.</h2>
+    <ul>
+      <li><i>1</i><span><b>Muayenesi geçen araç</b> trafikte cezayla karşılaşır.</span></li>
+      <li><i>2</i><span><b>Sigortası biten araçla kaza</b> büyük masraf demek.</span></li>
+      <li><i>3</i><span><b>Faturası bulunamayan</b> garantili ürün parayla tamir edilir.</span></li>
+      <li><i>4</i><span><b>Kaçan kart ödemesi</b> gecikme faizi olarak geri döner.</span></li>
+    </ul>
+  </div>
+  <div class="band" style="grid-template-columns:1fr;padding:34px">
+    <div><div class="eyebrow" style="color:#B9D9DB">Gizlilik önce gelir</div><h2 style="margin-top:10px">Bilgilerin senin telefonunda kalır.</h2><p>Hesap açmak zorunda değilsin. Belgelerin bir sunucuya yüklenmez, fotoğraflardan okuma telefonun içinde yapılır.</p></div>
+    <ul>
+      <li>Kart numarası, CVV ve şifre asla istenmez</li>
+      <li>Reklam yok, veri satışı yok</li>
+      <li>Yazı okuma internetsiz çalışır</li>
+      <li>Yedek dosyan şifreyle kilitli (AES-256)</li>
+    </ul>
+  </div>
+</div></section>
+
+<section id="fiyat" style="padding-top:0"><div class="wrap">
+  <div class="head"><div class="eyebrow">Fiyat</div><h2>İlk ay bizden. Beğenirsen devam et.</h2><p>Bütün özellikler 1 ay boyunca ücretsiz. Deneme için kart bilgisi istenmez.</p></div>
+  <div class="plans">
+    <div class="plan"><h3>Aylık</h3><div class="price">₺49,99 <small>/ ay</small></div><ul><li>İlk ay ücretsiz</li><li>Sınırsız belge ve ödeme</li><li>Fotoğraftan otomatik okuma</li><li>Tüm hatırlatmalar</li></ul><a class="btn ghost" href="#indir">1 ay ücretsiz dene</a></div>
+    <div class="plan best"><h3>Yıllık</h3><div class="price">₺399 <small>/ yıl</small></div><ul><li>İlk ay ücretsiz</li><li>Aylığa göre yaklaşık 4 ay bedava</li><li>Aylık ₺33'e denk gelir</li><li>Şifreli yedek ve yeni telefona taşıma</li></ul><a class="btn dark" href="#indir">1 ay ücretsiz dene</a></div>
+    <div class="plan"><h3>Aile</h3><div class="price">₺599 <small>/ yıl</small></div><ul><li>İlk ay ücretsiz</li><li>5 kişiye kadar</li><li>Ortak aile kasası</li><li>Eşinin ve ebeveynlerinin hatırlatmaları</li></ul><a class="btn ghost" href="#indir">Aileni ekle</a></div>
+  </div>
+  <p class="note">Sahte SMS kontrolü herkese her zaman ücretsiz. Fiyatlar örnektir ve yayın öncesi değişebilir. Aile paketi yakında.</p>
+</div></section>
+
+<section id="sss" style="padding-top:0"><div class="wrap faq">
+  <div class="head"><div class="eyebrow">Sorular</div><h2>Merak edilenler</h2></div>
+  <details><summary>Belgelerim nerede saklanıyor?</summary><p>Sadece senin telefonunda. Dürt belgelerini bir sunucuya göndermez. Yedek alırsan kayıtların ve fotoğrafların senin şifrenle kilitli bir dosyaya yazılır; dosya yine sende kalır.</p></details>
+  <details><summary>Kart bilgilerimi istiyor mu?</summary><p>Hayır. Sadece bankanın adını ve son ödeme gününü kaydedersin. Kart numarası, CVV ve şifre hiçbir zaman istenmez.</p></details>
+  <details><summary>Fotoğraftan okuma her belgede çalışır mı?</summary><p>Poliçe, ekstre, garanti belgesi ve faturaların çoğunda tarihi doğru okur. Okuyamazsa tarihi tek dokunuşla elle seçersin.</p></details>
+  <details><summary>Bildirimler ne zaman gelir?</summary><p>Belgelerde 30, 7 ve 1 gün kala ve son gün sabahı. Kart ve aboneliklerde 3 ve 1 gün kala, çek ve senetlerde 7, 3 ve 1 gün kala. Bildirim saatini ayarlardan sen seçersin.</p></details>
+  <details><summary>Deneme süresi bitince ne olur?</summary><p>İlk ay bütün özellikler ücretsiz ve kart bilgisi istenmez, yani deneme bitince otomatik ücret alınmaz. Devam etmek istersen aylık ya da yıllık abone olursun. Abone olmasan da kayıtların silinmez; istediğin zaman görebilir ve dışa aktarabilirsin.</p></details>
+  <details><summary>iPhone ve Android'de var mı?</summary><p>Evet, ikisinde de çalışacak. Mağazalarda yayına girene kadar tarayıcıda deneme sürümünü kullanabilirsin.</p></details>
+</div></section>
+
+<div class="wrap"><div class="band final" style="display:block;text-align:center;margin-bottom:60px">
+  <h2>Bir daha hiçbir tarihi kaçırma.</h2>
+  <p style="color:rgba(255,255,255,.82)">İlk ay ücretsiz. Kurulum bir dakika, ilk belgen otuz saniye.</p>
+  <div class="ctas">
+    <a class="btn" style="background:#F3F1EC;color:#1C3B3F" href="#" data-soon><span class="lab"><small>Yakında</small>App Store</span></a>
+    <a class="btn" style="background:#F3F1EC;color:#1C3B3F" href="#" data-soon><span class="lab"><small>Yakında</small>Google Play</span></a>
+  </div>
+</div></div>
+
+<footer><div class="wrap">
+  <span>© 2026 Dürt</span>
+  <span><a href="/yasal/gizlilik.html">Gizlilik politikası</a> · <a href="/yasal/kvkk.html">KVKK aydınlatma metni</a> · <a href="/yasal/sartlar.html">Kullanım koşulları</a> · <a href="mailto:destek@durt.app">destek@durt.app</a></span>
+</div></footer>
+
+<script>
+document.querySelectorAll('[data-soon]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=document.createElement('div');t.className='toast';t.textContent='Mağazalarda çok yakında. Şimdilik tarayıcıda deneyebilirsin.';document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}));
+</script>
