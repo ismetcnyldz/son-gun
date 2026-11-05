@@ -23,6 +23,7 @@ dependencies:
   share_plus: ^10.1.4
   file_picker: ^10.3.3
   add_2_calendar: ^3.0.1
+  cryptography: ^2.7.0
   purchases_flutter: ">=8.4.0 <9.0.0"
 
 dev_dependencies:

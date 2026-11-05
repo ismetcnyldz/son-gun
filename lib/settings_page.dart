@@ -42,47 +42,6 @@ class _SettingsPageState extends State<SettingsPage> {
         ),
       );
 
-  Future<void> _copyBackup() async {
-    final text = store.exportBackup();
-    await Clipboard.setData(ClipboardData(text: text));
-    _toast('${store.items.length} kayıt panoya kopyalandı. Notlara, e-postaya ya da WhatsApp\'ta kendine yapıştırıp sakla.');
-  }
-
-  Future<void> _restore() async {
-    final ctl = TextEditingController();
-    final d = await Clipboard.getData('text/plain');
-    if (d?.text?.startsWith('SONGUN1:') ?? false) ctl.text = d!.text!;
-    if (!mounted) return;
-    final ok = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: C.card,
-        title: Text('Yedekten geri yükle', style: display(22)),
-        content: TextField(
-          controller: ctl,
-          minLines: 3,
-          maxLines: 6,
-          decoration: const InputDecoration(hintText: 'Kopyaladığın yedeği buraya yapıştır (SONGUN1: ile başlar)'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Vazgeç')),
-          FilledButton(
-            style: FilledButton.styleFrom(minimumSize: const Size(100, 44)),
-            onPressed: () => Navigator.pop(ctx, true),
-            child: const Text('Geri yükle'),
-          ),
-        ],
-      ),
-    );
-    if (ok != true) return;
-    try {
-      final n = await store.importBackup(ctl.text);
-      _toast(n == 0 ? 'Yeni kayıt bulunamadı (hepsi zaten var).' : '$n kayıt geri yüklendi.');
-    } catch (_) {
-      _toast('Yedek okunamadı. Metnin tamamını kopyaladığından emin ol.');
-    }
-  }
-
   Future<void> _pickTime() async {
     final t = await showTimePicker(
       context: context,
@@ -96,9 +55,58 @@ class _SettingsPageState extends State<SettingsPage> {
     _toast('Hatırlatmalar artık ${Notifier.timeText}\'da gelecek.');
   }
 
+  /// Şifre sorar. confirm: iki kez yazdırır (yeni yedek için)
+  Future<String?> _askPassword({required bool confirm}) async {
+    final a = TextEditingController();
+    final b = TextEditingController();
+    String? err;
+    final res = await showDialog<String>(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setD) => AlertDialog(
+          backgroundColor: C.card,
+          title: Text(confirm ? 'Yedeğe şifre koy' : 'Yedeğin şifresi', style: display(22)),
+          content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Text(
+              confirm
+                  ? 'Yedek dosyan bu şifreyle kilitlenir. Dosyayı ele geçiren biri şifre olmadan açamaz.\n\nŞifreyi unutursan yedek açılamaz, bir yere not et.'
+                  : 'Yedeği alırken koyduğun şifreyi yaz.',
+              style: TextStyle(color: C.muted, fontSize: 13, height: 1.4),
+            ),
+            const SizedBox(height: 12),
+            TextField(controller: a, obscureText: true, autofocus: true, decoration: const InputDecoration(hintText: 'Şifre')),
+            if (confirm) ...[
+              const SizedBox(height: 8),
+              TextField(controller: b, obscureText: true, decoration: const InputDecoration(hintText: 'Şifre (tekrar)')),
+            ],
+            if (err != null) Padding(padding: const EdgeInsets.only(top: 8), child: Text(err!, style: TextStyle(color: C.red, fontSize: 12.5))),
+          ]),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Vazgeç')),
+            FilledButton(
+              style: FilledButton.styleFrom(minimumSize: const Size(100, 44)),
+              onPressed: () {
+                if (confirm && a.text.length < 6) return setD(() => err = 'En az 6 karakter olsun.');
+                if (confirm && a.text != b.text) return setD(() => err = 'İki şifre aynı değil.');
+                if (a.text.isEmpty) return;
+                Navigator.pop(ctx, a.text);
+              },
+              child: Text(confirm ? 'Yedeği oluştur' : 'Aç'),
+            ),
+          ],
+        ),
+      ),
+    );
+    return res;
+  }
+
   Future<void> _shareFile() async {
+    if (store.items.isEmpty) return _toast('Henüz yedeklenecek kayıt yok.');
+    final pw = await _askPassword(confirm: true);
+    if (pw == null) return;
+    _toast('Yedek hazırlanıyor…');
     try {
-      await shareBackupFile();
+      await shareBackupFile(pw);
     } catch (_) {
       _toast('Yedek dosyası oluşturulamadı.');
     }
@@ -106,9 +114,18 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<void> _importFile() async {
     try {
-      final n = await importBackupFile();
-      if (n == null) return;
+      final text = await pickBackupFile();
+      if (text == null) return;
+      String? pw;
+      if (text.trimLeft().startsWith('DURT2:')) {
+        pw = await _askPassword(confirm: false);
+        if (pw == null) return;
+        _toast('Yedek açılıyor…');
+      }
+      final n = await restoreBackup(text, password: pw);
       _toast(n == 0 ? 'Yeni kayıt bulunamadı (hepsi zaten var).' : '$n kayıt geri yüklendi.');
+    } on WrongPassword {
+      _toast('Şifre yanlış. Tekrar dene.');
     } catch (_) {
       _toast('Bu dosya bir Dürt yedeği değil ya da bozuk.');
     }
@@ -205,12 +222,10 @@ class _SettingsPageState extends State<SettingsPage> {
             _tile(
               icon: Icons.ios_share_rounded,
               title: 'Yedek dosyası kaydet',
-              sub: 'iCloud Drive, Google Drive, e-posta ya da WhatsApp\'a kaydet. Telefon kaybolursa buradan geri yüklersin.',
+              sub: 'Kayıtlar ve belge fotoğrafları, şifreyle kilitli tek dosya. iCloud Drive, Google Drive ya da WhatsApp\'a kaydet.',
               onTap: _shareFile,
             ),
-            _tile(icon: Icons.file_open_rounded, title: 'Dosyadan geri yükle', sub: 'Kaydettiğin .durt yedek dosyasını seç', onTap: _importFile),
-            _tile(icon: Icons.copy_all_rounded, title: 'Yedeği metin olarak kopyala', sub: 'Notlara ya da mesaja yapıştırıp sakla', onTap: _copyBackup),
-            _tile(icon: Icons.content_paste_go_rounded, title: 'Metinden geri yükle', sub: 'Kopyaladığın yedeği yapıştır', onTap: _restore),
+            _tile(icon: Icons.file_open_rounded, title: 'Yedekten geri yükle', sub: 'Yeni telefonda .durt yedek dosyanı seç', onTap: _importFile),
             _label('Destek'),
             _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Dürt - Sorun bildirimi')),
             _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Dürt - Öneri')),

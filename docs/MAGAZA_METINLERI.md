@@ -41,7 +41,7 @@ Verilen ya da alınan çeklerin, senetlerin ve kredi taksitlerinin vadesini 7, 3
 🔒 GİZLİLİK VE GÜVENLİK
 • Kayıtların telefonunda saklanır, reklam yok.
 • Yüz tanıma, parmak izi ya da ekran kilidiyle uygulama kilidi.
-• Yedek dosyanı iCloud Drive ya da Google Drive'a kaydet; telefonun kaybolsa bile kayıtların kaybolmaz.
+• Kayıtlarını ve belge fotoğraflarını şifreli tek dosyada yedekle, iCloud Drive ya da Google Drive'a kaydet; telefonun kaybolsa bile kayıtların kaybolmaz.
 • Kayıtların arasında hızlı arama.
 • Koyu ve açık tema.
 
