@@ -2,7 +2,7 @@
 import json, sys, datetime as dt
 from playwright.sync_api import sync_playwright
 
-BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8080/son-gun/'
+BASE = sys.argv[1] if len(sys.argv) > 1 else 'http://localhost:8080/uygulama/'
 OUT = sys.argv[2] if len(sys.argv) > 2 else 'shots'
 today = dt.date.today()
 def d(n): return (today + dt.timedelta(days=n)).isoformat() + 'T00:00:00.000'

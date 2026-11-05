@@ -94,26 +94,32 @@ jobs:
           python3 tool/patch_web.py
           flutter pub get
           dart run flutter_launcher_icons -f tool/icons_web.yaml
-          flutter build web --release --base-href /son-gun/
-          cp -r site/yasal build/web/yasal
+          flutter build web --release --base-href /uygulama/
+          # Site düzeni: durt.app (tanıtım), /uygulama (web sürümü), /yasal (gizlilik, KVKK, şartlar)
+          mkdir -p build/site
+          cp site/tanitim/index.html build/site/index.html
+          cp -r build/web build/site/uygulama
+          cp -r site/yasal build/site/yasal
+          cp assets/icon/icon.png build/site/icon.png
+          echo "durt.app" > build/site/CNAME
 
       - name: Mağaza ekran görüntüleri
         continue-on-error: true
         run: |
           pip install playwright==1.48.0
           python3 -m playwright install --with-deps chromium
-          mkdir -p /tmp/site && cp -r build/web /tmp/site/son-gun
+          mkdir -p /tmp/site && cp -r build/web /tmp/site/uygulama
           (cd /tmp/site && python3 -m http.server 8080 >/dev/null 2>&1 &)
           sleep 2
-          python3 tool/screens.py http://localhost:8080/son-gun/ build/web/shots
-          python3 tool/frames.py build/web/shots build/web/store
-          ls -R build/web/store
+          python3 tool/screens.py http://localhost:8080/uygulama/ build/site/shots
+          python3 tool/frames.py build/site/shots build/site/store
+          ls -R build/site/store
 
       - name: GitHub Pages'e yayınla (gh-pages dalı)
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cd build/web
+          cd build/site
           touch .nojekyll
           git init -q -b gh-pages
           git config user.name "github-actions"

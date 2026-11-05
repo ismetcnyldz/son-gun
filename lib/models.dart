@@ -11,7 +11,7 @@ const String supportEmail = 'destek@durt.app';
 const String appVersion = '1.0.0';
 
 /// Yasal sayfalar (alan adı alınınca güncellenecek)
-const String siteBase = 'https://ismetcnyldz.github.io/son-gun';
+const String siteBase = 'https://durt.app';
 const String privacyUrl = '$siteBase/yasal/gizlilik.html';
 const String termsUrl = '$siteBase/yasal/sartlar.html';
 const String kvkkUrl = '$siteBase/yasal/kvkk.html';
