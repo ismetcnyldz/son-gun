@@ -74,6 +74,17 @@ jobs:
           flutter pub get
           flutter build web --release --base-href /son-gun/
 
+      - name: Mağaza ekran görüntüleri
+        continue-on-error: true
+        run: |
+          pip install playwright==1.48.0
+          python3 -m playwright install --with-deps chromium
+          mkdir -p /tmp/site && cp -r build/web /tmp/site/son-gun
+          (cd /tmp/site && python3 -m http.server 8080 >/dev/null 2>&1 &)
+          sleep 2
+          python3 tool/screens.py http://localhost:8080/son-gun/ build/web/shots
+          ls build/web/shots
+
       - name: GitHub Pages'e yayınla (gh-pages dalı)
         env:
           GH_TOKEN: ${{ github.token }}

@@ -57,7 +57,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
     final last = page == pages.length - 1;
     return Scaffold(
       body: SafeArea(
-        child: Column(children: [
+        child: Center(child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 560), child: Column(children: [
           Align(
             alignment: Alignment.centerRight,
             child: TextButton(
@@ -89,7 +89,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               child: Text(last ? (kIsWeb ? 'Başla' : 'Bildirimlere izin ver ve başla') : 'Devam'),
             ),
           ),
-        ]),
+        ]))),
       ),
     );
   }
