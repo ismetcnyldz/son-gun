@@ -50,7 +50,7 @@ RenewLink? renewLinkFor(Item it) {
   if (t.contains('dask') || t.contains('zorunlu deprem')) return const RenewLink('DASK poliçeni sorgula', 'https://www.dask.gov.tr');
   if (it.kind == Kind.abonelik) {
     for (final (k, url) in _manage) {
-      if (RegExp('(^|[^a-zçğıöşü])${RegExp.escape(k)}').hasMatch(t)) return RenewLink('Aboneliği yönet / iptal et', url);
+      if (RegExp('(^|[^a-zçğıöşü0-9])${RegExp.escape(k)}(?![a-zçğıöşü])').hasMatch(t)) return RenewLink('Aboneliği yönet / iptal et', url);
     }
   }
   return null;
