@@ -39,7 +39,7 @@ def open_app(browser, theme, onboarded=True):
   ctx.add_init_script('const v=%s; if(!sessionStorage.getItem("seeded")){localStorage.clear(); for (const k in v) localStorage.setItem(k, v[k]); sessionStorage.setItem("seeded","1");}' % json.dumps(prefs(theme, onboarded)))
   page = ctx.new_page()
   page.goto(BASE)
-  page.wait_for_selector('flt-glass-pane', timeout=60000)
+  page.wait_for_selector('flutter-view, flt-glass-pane', state='attached', timeout=60000)
   page.wait_for_timeout(5000)
   # erişilebilirlik ağacını aç: öğelere yazıyla tıklayabilmek için
   page.evaluate("() => { const p = document.querySelector('flt-semantics-placeholder'); if (p) p.click(); }")
