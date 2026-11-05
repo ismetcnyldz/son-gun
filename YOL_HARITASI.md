@@ -51,3 +51,21 @@ Her ay bir güncelleme hedefi. Sıra ihtiyaca göre değişebilir; yeni fikirler
 - Deprem çantası son kullanma takibi
 - Topluluk market fiyatları (fişlerden)
 - Filo / şirket araçları sürümü (araç başına aylık ücret)
+
+
+## 5 Kasım 2026: 1.0 hazırlığında tamamlananlar
+- Hoş geldin ekranları, 30 gün kartsız deneme, abonelik ekranı (RevenueCat kodu hazır, anahtar bekleniyor)
+- Çek / senet / kredi taksiti türü, bildirim saati ayarı, arama
+- Abonelik iptal rehberi (Netflix, Spotify, YouTube, Disney+, Prime, iCloud, operatörler…)
+- Yedek dosyası (iCloud Drive / Google Drive / WhatsApp) ve dosyadan geri yükleme
+- Telefonun takvimine ekleme
+- Uygulama simgesi, mağaza görselleri ve metinleri, gizlilik / KVKK / şartlar sayfaları
+- Google Play paketi (AAB), iPhone derlemesi kontrolü
+
+## Hesaplar açılınca (sırayla)
+1. Google Play + Apple geliştirici hesapları (dükkân adına, D-U-N-S ile)
+2. Yükleme imza anahtarı → GitHub Secrets (ANDROID_KEYSTORE_BASE64, ANDROID_KEY_PASSWORD)
+3. RevenueCat: ürünler `songun_aylik`, `songun_yillik`, yetki `premium` → anahtarlar GitHub Secrets (RC_ANDROID_KEY, RC_IOS_KEY)
+4. iPhone: Codemagic ya da GitHub Actions ile imzalı derleme → TestFlight
+5. Kapalı test → yayın
+6. Firebase: Apple/Google ile giriş + şifreli bulut yedeği, Crashlytics, aile kasası

@@ -27,17 +27,24 @@ Plakanı ve ilk tescil tarihini gir. Araç muayenesi, MTV taksitleri (Ocak ve Te
 Kredi kartı son ödeme günlerini, Netflix, Spotify, internet, kira, aidat gibi aylık ödemeleri gör. Aylık ve yıllık abonelik toplamını tek bakışta öğren.
 Kart numarası, CVV ya da şifre asla istenmez. Sadece banka adı ve son ödeme günü tutulur.
 
+🧾 ÇEK, SENET VE TAKSİTLER
+Verilen ya da alınan çeklerin, senetlerin ve kredi taksitlerinin vadesini 7, 3 ve 1 gün kala hatırlat.
+
+📅 TAKVİMİNE DE EKLE
+İstediğin kaydı tek dokunuşla telefonunun takvimine ekle. Bildirim saatini kendin seç.
+
 🛡️ SAHTE SMS KONTROLÜ
 "İcra takibi başlatıldı", "kargonuz bekliyor", "ödül kazandınız"... Şüphelendiğin mesajı yapıştır, linke tıklamadan önce dolandırıcılık belirtilerini gör.
 
 🔒 GİZLİLİK VE GÜVENLİK
 • Kayıtların telefonunda saklanır, reklam yok.
 • Yüz tanıma, parmak izi ya da ekran kilidiyle uygulama kilidi.
-• Yedeğini al, yeni telefonuna kolayca taşı.
+• Yedek dosyanı iCloud Drive ya da Google Drive'a kaydet; telefonun kaybolsa bile kayıtların kaybolmaz.
+• Kayıtların arasında hızlı arama.
 • Koyu ve açık tema.
 
 NELERİ TAKİP EDEBİLİRSİN?
-Trafik sigortası, kasko, DASK, konut ve sağlık sigortası, araç muayenesi, MTV, emlak vergisi, ehliyet, pasaport, kimlik, kira sözleşmesi, telefon ve beyaz eşya garantileri, kredi kartı ödemeleri, dijital abonelikler, faturalar ve daha fazlası.
+Trafik sigortası, kasko, DASK, konut ve sağlık sigortası, çek ve senet vadeleri, kredi taksitleri, araç muayenesi, MTV, emlak vergisi, ehliyet, pasaport, kimlik, kira sözleşmesi, telefon ve beyaz eşya garantileri, kredi kartı ödemeleri, dijital abonelikler, faturalar ve daha fazlası.
 
 ÜCRETLENDİRME
 İlk 30 gün tamamen ücretsiz. Sonrasında aylık ya da yıllık abonelikle devam edebilirsin. Deneme bitmeden iptal edersen hiçbir ücret alınmaz. Abone olmasan da kayıtların silinmez.
@@ -70,7 +77,18 @@ Trafik sigortası, muayene, garanti, kart ödemesi… Fotoğrafını çek, tarih
 
 Görseller her derlemede uygulamanın güncel hâlinden otomatik yeniden üretilir.
 
-## Eksik (hesaplar açılınca)
-- Gizlilik politikası adresi (alan adı + dükkân bilgileri gerekiyor)
-- Uygulama simgesi (512×512 Play, 1024×1024 App Store)
-- Destek e-postasının gerçekten çalışması (alan adına bağlı)
+- Uygulama simgesi: `store/icon-512.png` (Play), `store/icon-1024.png` (App Store)
+
+## Bağlantılar
+- Gizlilik politikası: https://ismetcnyldz.github.io/son-gun/yasal/gizlilik.html
+- KVKK: https://ismetcnyldz.github.io/son-gun/yasal/kvkk.html
+- Kullanım şartları: https://ismetcnyldz.github.io/son-gun/yasal/sartlar.html
+(Alan adı alınınca songun.app adresine taşınacak. Sayfalardaki [ŞİRKET UNVANI], [ADRES], [İL] alanları dükkân bilgileriyle doldurulacak.)
+
+## Mağaza formları için hazır cevaplar
+- **Veri güvenliği (Google) / Gizlilik etiketi (Apple):** Toplanan veri: yalnızca "Satın alımlar" (abonelik durumu, anonim kimlik; uygulama işlevi için, kişiyle ilişkilendirilmez). Konum, kişiler, fotoğraf, finans bilgisi toplanmaz; fotoğraflar cihazda işlenir. İzleme (tracking) yok. Reklam yok.
+- **İçerik derecelendirmesi:** Şiddet, cinsellik, kumar, kullanıcı etkileşimi yok → Herkes / 4+.
+- **Hedef kitle:** 18 yaş ve üstü.
+- **Reklam içeriyor mu:** Hayır.
+- **Uygulama erişimi (test için giriş):** Giriş gerekmez.
+- **Abonelik ürünleri (RevenueCat ve mağazada açılacak):** `songun_aylik` (₺49,99/ay), `songun_yillik` (₺399/yıl), yetki adı: `premium`.
