@@ -1187,7 +1187,7 @@ class _EditorPageState extends State<EditorPage> {
   }
 
   Widget _photoCard() {
-    if (kIsWeb) {
+    if (kIsWeb && !storeShots) {
       return Container(
         padding: EdgeInsets.all(14),
         decoration: BoxDecoration(color: C.card2, borderRadius: BorderRadius.circular(16)),

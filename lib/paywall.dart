@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'entitlement.dart';
 import 'main.dart';
+import 'models.dart';
 
 class PaywallPage extends StatefulWidget {
   const PaywallPage({super.key, this.firstRun = false});
@@ -134,7 +135,7 @@ class _PaywallPageState extends State<PaywallPage> {
                   textAlign: TextAlign.center,
                   style: TextStyle(color: C.muted, fontSize: 12, height: 1.4),
                 ),
-                if (!Entitlement.billingReady) ...[
+                if (!Entitlement.billingReady && !storeShots) ...[
                   const SizedBox(height: 8),
                   Text('Test sürümü: şu an ödeme alınmaz.', textAlign: TextAlign.center, style: TextStyle(color: C.amber, fontSize: 12, fontWeight: FontWeight.w700)),
                 ],

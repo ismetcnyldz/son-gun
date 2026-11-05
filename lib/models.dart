@@ -1,12 +1,17 @@
 // Kayıt modeli ve tarih yardımcıları
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
+
 /// Uygulamanın görünen adı. İsim değişirse sadece burası ve AndroidManifest değişir.
 const String appName = 'Son Gün';
 
 /// Destek e-postası (alan adı alınınca güncellenecek)
 const String supportEmail = 'destek@songun.app';
 const String appVersion = '0.3.0';
+
+/// Mağaza ekran görüntüsü modu (web, ?shots): deneme uyarılarını gizler
+final bool storeShots = kIsWeb && Uri.base.queryParameters.containsKey('shots');
 
 enum Kind { belge, garanti, kart, abonelik, diger }
 

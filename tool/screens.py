@@ -38,7 +38,7 @@ def open_app(browser, theme, onboarded=True):
   ctx = browser.new_context(viewport={'width': 430, 'height': 932}, device_scale_factor=3, locale='tr-TR')
   ctx.add_init_script('const v=%s; if(!sessionStorage.getItem("seeded")){localStorage.clear(); for (const k in v) localStorage.setItem(k, v[k]); sessionStorage.setItem("seeded","1");}' % json.dumps(prefs(theme, onboarded)))
   page = ctx.new_page()
-  page.goto(BASE)
+  page.goto(BASE + '?shots=1')
   page.wait_for_selector('flutter-view, flt-glass-pane', state='attached', timeout=60000)
   page.wait_for_timeout(5000)
   # erişilebilirlik ağacını aç: öğelere yazıyla tıklayabilmek için
@@ -73,12 +73,16 @@ with sync_playwright() as pw:
     shot(page, f'{theme}-home')
     page.mouse.wheel(0, 700); page.wait_for_timeout(800); shot(page, f'{theme}-home2')
     page.mouse.wheel(0, -2000); page.wait_for_timeout(500)
-    steps = [('Ödemeler', 'payments'), ('SMS', 'sms'), ('Ana sayfa', None), ('Ekle', 'editor')]
-    for t, n in steps:
-      try:
-        tap(page, t)
-        if n: shot(page, f'{theme}-{n}')
-      except Exception as e: print('fail', t, e)
+    page.mouse.click(214, 885); page.wait_for_timeout(1200); shot(page, f'{theme}-payments')
+    page.mouse.click(358, 885); page.wait_for_timeout(1200)
+    try:
+      tap(page, 'Örnek: sahte icra'); tap(page, 'Kontrol et')
+    except Exception as e: print('fail sms', e)
+    shot(page, f'{theme}-sms')
+    page.mouse.click(72, 885); page.wait_for_timeout(1200)
+    try:
+      tap(page, 'Ekle'); shot(page, f'{theme}-editor')
+    except Exception as e: print('fail', 'Ekle', e)
     try:
       page.go_back(); page.wait_for_timeout(800)
     except Exception: pass
@@ -92,7 +96,7 @@ with sync_playwright() as pw:
     ctx, page = open_app(b, theme)
     try:
       tap(page, 'Ayarlar'); shot(page, f'{theme}-settings')
-      tap(page, 'Türkiye takvimi'); shot(page, f'{theme}-turkey')
+      page.mouse.click(215, 255); page.wait_for_timeout(1500); shot(page, f'{theme}-turkey')
     except Exception as e: print('fail settings', e)
     ctx.close()
   b.close()
