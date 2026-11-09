@@ -10,7 +10,7 @@ Future<bool> addToCalendar(Item it) async {
   final start = DateTime(due.year, due.month, due.day, Notifier.hour, Notifier.minute);
   final event = Event(
     title: '${it.title}: son gün',
-    description: [if (it.note.isNotEmpty) it.note, if (it.amount != null) 'Tutar: ${fmtMoney(it.amount!)}', 'Dürt uygulamasından eklendi.'].join('\n'),
+    description: [if (it.note.isNotEmpty) it.note, if (it.amount != null) 'Tutar: ${fmtMoney(it.amount!)}', 'Vakitbil uygulamasından eklendi.'].join('\n'),
     startDate: start,
     endDate: start.add(const Duration(hours: 1)),
     allDay: true,

@@ -1,4 +1,4 @@
-# Dürt – Yol Haritası
+# Vakitbil – Yol Haritası
 
 Her ay bir güncelleme hedefi. Sıra ihtiyaca göre değişebilir; yeni fikirler en alttaki "Fikir kutusu"na eklenir.
 
@@ -65,7 +65,7 @@ Her ay bir güncelleme hedefi. Sıra ihtiyaca göre değişebilir; yeni fikirler
 ## Hesaplar açılınca (sırayla)
 1. Google Play + Apple geliştirici hesapları (dükkân adına, D-U-N-S ile)
 2. Yükleme imza anahtarı → GitHub Secrets (ANDROID_KEYSTORE_BASE64, ANDROID_KEY_PASSWORD)
-3. RevenueCat: ürünler `durt_aylik`, `durt_yillik`, yetki `premium` → anahtarlar GitHub Secrets (RC_ANDROID_KEY, RC_IOS_KEY)
+3. RevenueCat: ürünler `vakitbil_aylik`, `vakitbil_yillik`, yetki `premium` → anahtarlar GitHub Secrets (RC_ANDROID_KEY, RC_IOS_KEY)
 4. iPhone: Codemagic ya da GitHub Actions ile imzalı derleme → TestFlight
 5. Kapalı test → yayın
 6. Firebase: Apple/Google ile giriş + şifreli bulut yedeği, Crashlytics, aile kasası

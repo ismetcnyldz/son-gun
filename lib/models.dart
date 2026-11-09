@@ -4,14 +4,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 /// Uygulamanın görünen adı. İsim değişirse sadece burası ve AndroidManifest değişir.
-const String appName = 'Dürt';
+const String appName = 'Vakitbil';
 
 /// Destek e-postası (alan adı alınınca güncellenecek)
-const String supportEmail = 'destek@durt.app';
+const String supportEmail = 'vakitbil.destek@gmail.com';
 const String appVersion = '1.0.0';
 
 /// Yasal sayfalar (alan adı alınınca güncellenecek)
-const String siteBase = 'https://durt.app';
+const String siteBase = 'https://ismetcnyldz.github.io/son-gun';
 const String privacyUrl = '$siteBase/yasal/gizlilik.html';
 const String termsUrl = '$siteBase/yasal/sartlar.html';
 const String kvkkUrl = '$siteBase/yasal/kvkk.html';

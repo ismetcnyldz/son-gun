@@ -70,12 +70,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp build/app/outputs/flutter-apk/app-release.apk Durt.apk
-          cp build/app/outputs/bundle/release/app-release.aab Durt.aab
+          cp build/app/outputs/flutter-apk/app-release.apk Vakitbil.apk
+          cp build/app/outputs/bundle/release/app-release.aab Vakitbil.aab
           gh release delete deneme --yes --cleanup-tag || true
-          gh release create deneme Durt.apk Durt.aab --target "${{ github.sha }}" --prerelease \
-            --title "Dürt - deneme sürümü" \
-            --notes "Telefondan Durt.apk dosyasına dokunup indir, sonra açıp kur. Android 'bilinmeyen kaynak' izni isteyebilir."
+          gh release create deneme Vakitbil.apk Vakitbil.aab --target "${{ github.sha }}" --prerelease \
+            --title "Vakitbil - deneme sürümü" \
+            --notes "Telefondan Vakitbil.apk dosyasına dokunup indir, sonra açıp kur. Android 'bilinmeyen kaynak' izni isteyebilir."
 
   web:
     runs-on: ubuntu-latest
@@ -94,24 +94,23 @@ jobs:
           python3 tool/patch_web.py
           flutter pub get
           dart run flutter_launcher_icons -f tool/icons_web.yaml
-          flutter build web --release --base-href /uygulama/
-          # Site düzeni: durt.app (tanıtım), /uygulama (web sürümü), /yasal (gizlilik, KVKK, şartlar)
+          flutter build web --release --base-href /son-gun/uygulama/
+          # Site düzeni: kök (tanıtım), /uygulama (web sürümü), /yasal (gizlilik, KVKK, şartlar)
           mkdir -p build/site
           cp site/tanitim/index.html build/site/index.html
           cp -r build/web build/site/uygulama
           cp -r site/yasal build/site/yasal
           cp assets/icon/icon.png build/site/icon.png
-          echo "durt.app" > build/site/CNAME
 
       - name: Mağaza ekran görüntüleri
         continue-on-error: true
         run: |
           pip install playwright==1.48.0
           python3 -m playwright install --with-deps chromium
-          mkdir -p /tmp/site && cp -r build/web /tmp/site/uygulama
+          mkdir -p /tmp/site/son-gun && cp -r build/web /tmp/site/son-gun/uygulama
           (cd /tmp/site && python3 -m http.server 8080 >/dev/null 2>&1 &)
           sleep 2
-          python3 tool/screens.py http://localhost:8080/uygulama/ build/site/shots
+          python3 tool/screens.py http://localhost:8080/son-gun/uygulama/ build/site/shots
           python3 tool/frames.py build/site/shots build/site/store
           ls -R build/site/store
 

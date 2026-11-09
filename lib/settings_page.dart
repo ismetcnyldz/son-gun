@@ -144,7 +144,7 @@ class _SettingsPageState extends State<SettingsPage> {
       final text = await pickBackupFile();
       if (text == null) return;
       String? pw;
-      if (text.trimLeft().startsWith('DURT2:')) {
+      if (text.trimLeft().startsWith(backupPrefixText)) {
         final r = await _askPassword(confirm: false, hint: backupHint(text));
         if (r == null) return;
         pw = r.$1;
@@ -155,7 +155,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } on WrongPassword {
       _toast('Şifre yanlış. Tekrar dene.');
     } catch (_) {
-      _toast('Bu dosya bir Dürt yedeği değil ya da bozuk.');
+      _toast('Bu dosya bir Vakitbil yedeği değil ya da bozuk.');
     }
   }
 
@@ -190,7 +190,7 @@ class _SettingsPageState extends State<SettingsPage> {
             _label('Abonelik'),
             _tile(
               icon: Icons.workspace_premium_rounded,
-              title: 'Dürt Premium',
+              title: 'Vakitbil Premium',
               sub: sub,
               onTap: () async {
                 await Navigator.push(context, MaterialPageRoute(builder: (_) => const PaywallPage()));
@@ -253,10 +253,10 @@ class _SettingsPageState extends State<SettingsPage> {
               sub: 'Kayıtlar ve belge fotoğrafları, şifreyle kilitli tek dosya. iCloud Drive, Google Drive ya da WhatsApp\'a kaydet.',
               onTap: _shareFile,
             ),
-            _tile(icon: Icons.file_open_rounded, title: 'Yedekten geri yükle', sub: 'Yeni telefonda .durt yedek dosyanı seç', onTap: _importFile),
+            _tile(icon: Icons.file_open_rounded, title: 'Yedekten geri yükle', sub: 'Yeni telefonda .vakitbil yedek dosyanı seç', onTap: _importFile),
             _label('Destek'),
-            _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Dürt - Sorun bildirimi')),
-            _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Dürt - Öneri')),
+            _tile(icon: Icons.bug_report_rounded, title: 'Sorun bildir', sub: 'Bir hata mı gördün? Bize yaz, düzeltelim.', onTap: () => _mail('Vakitbil - Sorun bildirimi')),
+            _tile(icon: Icons.lightbulb_rounded, title: 'Öneri gönder', sub: 'Eklenmesini istediğin bir şey var mı?', onTap: () => _mail('Vakitbil - Öneri')),
             _label('Hakkında'),
             _tile(icon: Icons.shield_moon_rounded, title: 'Gizlilik politikası', sub: 'Kayıtların sadece bu cihazda tutulur. Kart numarası, şifre istenmez.', onTap: () => _open(privacyUrl)),
             _tile(icon: Icons.gavel_rounded, title: 'KVKK aydınlatma metni', onTap: () => _open(kvkkUrl)),

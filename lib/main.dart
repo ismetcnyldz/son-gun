@@ -73,7 +73,7 @@ Future<void> _start() async {
   } catch (e) {
     debugPrint('Kayıtlar yüklenemedi: $e');
   }
-  runApp(DurtApp());
+  runApp(VakitbilApp());
   // Ödeme sistemi açılışı geciktirmesin; abonelik durumu değişince hatırlatmalar yeniden kurulur
   var wasActive = entitlement.active;
   entitlement.addListener(() {
@@ -127,13 +127,13 @@ class C {
 TextStyle display(double size, {Color? color, FontWeight w = FontWeight.w700}) =>
     GoogleFonts.fraunces(fontSize: size, fontWeight: w, color: color ?? C.ink, height: 1.05, letterSpacing: -0.4);
 
-class DurtApp extends StatefulWidget {
-  DurtApp({super.key});
+class VakitbilApp extends StatefulWidget {
+  VakitbilApp({super.key});
   @override
-  State<DurtApp> createState() => _DurtAppState();
+  State<VakitbilApp> createState() => _VakitbilAppState();
 }
 
-class _DurtAppState extends State<DurtApp> with WidgetsBindingObserver {
+class _VakitbilAppState extends State<VakitbilApp> with WidgetsBindingObserver {
   @override
   void initState() {
     super.initState();

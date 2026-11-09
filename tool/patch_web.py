@@ -1,7 +1,7 @@
 """Web deneme sürümü için başlık ve 'Ana Ekrana Ekle' ayarları."""
 import json, pathlib, re
 
-NAME = "Dürt"
+NAME = "Vakitbil"
 web = pathlib.Path("web")
 idx = web / "index.html"
 h = idx.read_text(encoding="utf-8")
@@ -9,7 +9,7 @@ h = re.sub(r"<title>.*?</title>", f"<title>{NAME}</title>", h, flags=re.S)
 h = re.sub(r'(name="apple-mobile-web-app-title" content=")[^"]*', r"\g<1>" + NAME, h)
 h = re.sub(r'(name="description" content=")[^"]*', r"\g<1>Belge, garanti ve ödeme son tarih hatırlatıcı", h)
 DIAG = """
-<div id="sg-diag" style="position:fixed;inset:0;z-index:99999;background:#F3F1EC;color:#22262B;font:15px -apple-system,Segoe UI,sans-serif;padding:24px;overflow:auto">Dürt yükleniyor…</div>
+<div id="sg-diag" style="position:fixed;inset:0;z-index:99999;background:#F3F1EC;color:#22262B;font:15px -apple-system,Segoe UI,sans-serif;padding:24px;overflow:auto">Vakitbil yükleniyor…</div>
 <script>
 window.__sgErr=[];
 window.addEventListener('error',function(e){__sgErr.push((e.message||'hata')+' @'+String(e.filename||'').split('/').pop()+':'+e.lineno)});

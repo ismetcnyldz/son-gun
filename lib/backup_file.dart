@@ -14,10 +14,13 @@ import 'models.dart';
 
 export 'backup_crypto.dart' show WrongPassword, NotABackup, backupHint;
 
+/// Şifreli yedeğin başlangıç işareti
+const backupPrefixText = backupPrefix;
+
 String _fileName() {
   final d = DateTime.now();
   String two(int n) => n.toString().padLeft(2, '0');
-  return 'Durt-yedek-${d.year}-${two(d.month)}-${two(d.day)}.durt';
+  return 'Vakitbil-yedek-${d.year}-${two(d.month)}-${two(d.day)}.vakitbil';
 }
 
 /// Kayıtları ve fotoğrafları tek JSON metnine çevirir
@@ -34,7 +37,7 @@ Future<String> _buildPlain() async {
     }
   }
   return jsonEncode({
-    'app': 'durt',
+    'app': 'vakitbil',
     'v': 2,
     'created': DateTime.now().toIso8601String(),
     'items': store.items.map((e) => e.toJson()).toList(),
@@ -54,7 +57,7 @@ Future<int> shareBackupFile(String password, {String? hint}) async {
     final dir = await getTemporaryDirectory();
     final f = File('${dir.path}/$name');
     await f.writeAsBytes(bytes, flush: true);
-    await Share.shareXFiles([XFile(f.path, mimeType: 'application/octet-stream')], subject: 'Dürt yedeği');
+    await Share.shareXFiles([XFile(f.path, mimeType: 'application/octet-stream')], subject: 'Vakitbil yedeği');
   }
   return (jsonDecode(plain)['photos'] as Map).length;
 }

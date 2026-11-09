@@ -1,11 +1,11 @@
 // Yedek dosyasını şifreleme: PBKDF2 (SHA-256) ile şifreden anahtar, AES-256-GCM ile şifreleme.
-// Biçim: "DURT2:" + base64(json{v, it, s, n, m, c})
+// Biçim: "VKB2:" + base64(json{v, it, s, n, m, c})
 import 'dart:convert';
 import 'dart:math';
 
 import 'package:cryptography/cryptography.dart';
 
-const backupPrefix = 'DURT2:';
+const backupPrefix = 'VKB2:';
 const _iterations = 60000;
 
 class WrongPassword implements Exception {}

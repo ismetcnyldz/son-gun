@@ -16,7 +16,7 @@ void main() {
   });
 
   test('bozuk dosya tanınıyor', () async {
-    expect(() => decryptBackup('DURT2:@@@', 'x'), throwsA(isA<NotABackup>()));
+    expect(() => decryptBackup('VKB2:@@@', 'x'), throwsA(isA<NotABackup>()));
   });
 
   test('ipucu okunuyor, şifre açık edilmiyor', () async {

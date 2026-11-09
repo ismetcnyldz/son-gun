@@ -4,7 +4,7 @@ from playwright.sync_api import sync_playwright
 
 SHOTS = sys.argv[1]; OUT = sys.argv[2]
 FRAMES = [
-  ('light-home',     'light', 'DÜRT',               'Son günü sen unut,<br>Dürt unutmaz.'),
+  ('light-home',     'light', 'VAKİTBİL',           'Son günü sen unut,<br>Vakitbil hatırlatır.'),
   ('dark-editor',    'teal',  'FOTOĞRAFTAN OKUMA',  'Fotoğrafını çek,<br>tarihi biz okuyalım.'),
   ('light-payments', 'light', 'KART VE ABONELİK',   'Bütün ödemelerin<br>tek bakışta.'),
   ('dark-sms',       'teal',  'SMS KONTROLÜ',       'Sahte mesajı<br>tıklamadan yakala.'),
@@ -42,8 +42,8 @@ def feature_html():
   p{{margin-top:18px;font-size:26px;font-weight:600;opacity:.85;line-height:1.3}}
   .ph{{position:absolute;right:70px;top:60px;width:300px;border-radius:40px;background:#0E1012;padding:9px;transform:rotate(4deg);box-shadow:0 20px 60px rgba(0,0,0,.4)}}
   .ph img{{display:block;width:100%;border-radius:32px}}
-  </style></head><body><div class="t"><div class="eb">BELGE · GARANTİ · ÖDEME</div><h1>Dürt</h1>
-  <p>Son günü sen unut,<br>Dürt unutmaz.</p></div><div class="ph"><img src="{img('light-home')}"></div></body></html>'''
+  </style></head><body><div class="t"><div class="eb">BELGE · GARANTİ · ÖDEME</div><h1>Vakitbil</h1>
+  <p>Son günü sen unut,<br>Vakitbil hatırlatır.</p></div><div class="ph"><img src="{img('light-home')}"></div></body></html>'''
 
 os.makedirs(f'{OUT}/ios', exist_ok=True); os.makedirs(f'{OUT}/play', exist_ok=True)
 with sync_playwright() as pw:
