@@ -69,3 +69,10 @@ Her ay bir güncelleme hedefi. Sıra ihtiyaca göre değişebilir; yeni fikirler
 4. iPhone: Codemagic ya da GitHub Actions ile imzalı derleme → TestFlight
 5. Kapalı test → yayın
 6. Firebase: Apple/Google ile giriş + şifreli bulut yedeği, Crashlytics, aile kasası
+
+## Sonraki güncellemeler için fikirler (9 Kasım 2026)
+- **İade süresi takibi:** İnternetten alınan ürünlerde 14 günlük cayma hakkı bitmeden uyarı (Trendyol, Hepsiburada vb.)
+- **Ücretsiz deneme bitişi:** Netflix, Spotify vb. denemeler ücretli olmadan 1 gün önce uyarı + iptal sayfası
+- **Kira artışı hatırlatıcı:** Artış tarihi + yasal orana göre yeni kira hesabı
+- **Araç bakım takibi:** Yağ değişimi, lastik, kış lastiği dönemi; tarih ve kilometreye göre
+- **Google / Apple ile giriş:** İsteğe bağlı bulut yedeği ve aile paylaşımı
