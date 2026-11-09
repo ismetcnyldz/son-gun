@@ -94,23 +94,24 @@ jobs:
           python3 tool/patch_web.py
           flutter pub get
           dart run flutter_launcher_icons -f tool/icons_web.yaml
-          flutter build web --release --base-href /son-gun/uygulama/
+          flutter build web --release --base-href /uygulama/
           # Site düzeni: kök (tanıtım), /uygulama (web sürümü), /yasal (gizlilik, KVKK, şartlar)
           mkdir -p build/site
           cp site/tanitim/index.html build/site/index.html
           cp -r build/web build/site/uygulama
           cp -r site/yasal build/site/yasal
           cp assets/icon/icon.png build/site/icon.png
+          echo "vakitbil.com" > build/site/CNAME
 
       - name: Mağaza ekran görüntüleri
         continue-on-error: true
         run: |
           pip install playwright==1.48.0
           python3 -m playwright install --with-deps chromium
-          mkdir -p /tmp/site/son-gun && cp -r build/web /tmp/site/son-gun/uygulama
+          mkdir -p /tmp/site && cp -r build/web /tmp/site/uygulama
           (cd /tmp/site && python3 -m http.server 8080 >/dev/null 2>&1 &)
           sleep 2
-          python3 tool/screens.py http://localhost:8080/son-gun/uygulama/ build/site/shots
+          python3 tool/screens.py http://localhost:8080/uygulama/ build/site/shots
           python3 tool/frames.py build/site/shots build/site/store
           ls -R build/site/store
 

@@ -51,7 +51,7 @@ Trafik sigortası, kasko, DASK, konut ve sağlık sigortası, çek ve senet vade
 ÜCRETLENDİRME
 İlk 30 gün tamamen ücretsiz. Sonrasında aylık ya da yıllık abonelikle devam edebilirsin. Deneme bitmeden iptal edersen hiçbir ücret alınmaz. Abone olmasan da kayıtların silinmez.
 
-Sorun ya da önerin için: vakitbil.destek@gmail.com
+Sorun ya da önerin için: destek@vakitbil.com
 
 **Kategori:** Verimlilik (Productivity)
 **Etiketler:** Hatırlatıcı, belge yönetimi, kişisel finans
@@ -82,9 +82,9 @@ Görseller her derlemede uygulamanın güncel hâlinden otomatik yeniden üretil
 - Uygulama simgesi: `store/icon-512.png` (Play), `store/icon-1024.png` (App Store)
 
 ## Bağlantılar
-- Gizlilik politikası: https://ismetcnyldz.github.io/son-gun/yasal/gizlilik.html
-- KVKK: https://ismetcnyldz.github.io/son-gun/yasal/kvkk.html
-- Kullanım şartları: https://ismetcnyldz.github.io/son-gun/yasal/sartlar.html
+- Gizlilik politikası: https://vakitbil.com/yasal/gizlilik.html
+- KVKK: https://vakitbil.com/yasal/kvkk.html
+- Kullanım şartları: https://vakitbil.com/yasal/sartlar.html
 (Alan adı alınınca kendi alan adına taşınacak. Sayfalardaki [ŞİRKET UNVANI], [ADRES], [İL] alanları dükkân bilgileriyle doldurulacak.)
 
 ## Mağaza formları için hazır cevaplar
