@@ -103,6 +103,10 @@ jobs:
           cp assets/icon/icon.png build/site/icon.png
           echo "vakitbil.com" > build/site/CNAME
 
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
       - name: Mağaza ekran görüntüleri
         continue-on-error: true
         run: |
