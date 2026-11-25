@@ -479,6 +479,13 @@ class _HomePageState extends State<HomePage> {
               ]),
             ),
             if (all.isEmpty) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(22),
+                  child: AspectRatio(aspectRatio: 900 / 505, child: Image.asset('assets/img/empty.jpg', fit: BoxFit.cover)),
+                ),
+              ),
               SectionTitle('Başlayalım'),
               _onboarding(),
             ] else ...[

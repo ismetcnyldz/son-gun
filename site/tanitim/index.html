@@ -8,7 +8,8 @@
 <meta property="og:title" content="Vakitbil: Son günü sen unut, Vakitbil hatırlatır.">
 <meta property="og:description" content="Belgelerin, garantilerin ve ödemelerin son günü tek yerde.">
 <meta property="og:image" content="icon.png">
-<link rel="icon" href="icon.png">
+<link rel="icon" href="img/logo.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap">
@@ -55,7 +56,7 @@ p{margin:0}
 
 /* logo */
 .logo{display:flex;align-items:center;gap:11px;text-decoration:none}
-.logo svg{width:42px;height:42px;flex:none;filter:drop-shadow(0 6px 10px rgba(18,63,69,.28))}
+.logo img{width:42px;height:42px;flex:none;border-radius:11px;box-shadow:0 6px 14px -4px rgba(18,63,69,.4)}
 .logo b{font:800 25px var(--display);letter-spacing:-.03em}
 .logo b span{color:var(--coral)}
 
@@ -68,12 +69,17 @@ nav.top .links a:hover{color:var(--ink)}
 
 /* hero */
 .hero{position:relative;isolation:isolate;overflow-x:clip}
-.hero::before{content:"";position:absolute;inset:-120px -10vw auto;height:820px;z-index:-1;
+.hero::before{content:"";position:absolute;inset:-120px -10vw auto;height:900px;z-index:-1;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);
   background:
     radial-gradient(420px 320px at 78% 30%,color-mix(in srgb,var(--coral) 26%,transparent),transparent 70%),
     radial-gradient(380px 300px at 92% 70%,color-mix(in srgb,var(--indigo) 22%,transparent),transparent 70%),
     radial-gradient(420px 340px at 58% 78%,color-mix(in srgb,var(--mint) 22%,transparent),transparent 70%),
-    radial-gradient(360px 260px at 12% 10%,color-mix(in srgb,var(--amber) 16%,transparent),transparent 70%)}
+    radial-gradient(360px 260px at 12% 10%,color-mix(in srgb,var(--amber) 16%,transparent),transparent 70%),
+    var(--herobg) center 20%/cover no-repeat}
+.hero::before{opacity:.9}
+:root{--herobg:url(img/hero-bg.webp)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--herobg:none}}
+:root[data-theme="dark"]{--herobg:none}
 .hero .grid{display:grid;grid-template-columns:1.02fr .98fr;gap:36px;align-items:center;padding-block:28px 70px}
 @media(max-width:940px){.hero .grid{grid-template-columns:1fr;padding-bottom:40px}}
 .hero h1{font-size:clamp(44px,6.6vw,84px)}
@@ -182,6 +188,9 @@ section{padding-block:96px}
 .privacy li i svg{width:16px;height:16px;fill:#fff}
 
 /* pricing */
+.shield{display:block;width:min(320px,80%);height:auto;margin:0 0 0 -30px;mix-blend-mode:multiply;-webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent);mask-image:radial-gradient(closest-side,#000 62%,transparent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .shield{display:none}}
+:root[data-theme="dark"] .shield{display:none}
 .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
 @media(max-width:900px){.plans{grid-template-columns:1fr}}
 .plan{border-radius:28px;padding:30px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
@@ -218,7 +227,7 @@ footer{border-top:1px solid var(--line);padding-block:30px;font-size:14px;color:
 footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
 footer nav{display:flex;gap:18px;flex-wrap:wrap}
 footer a{text-decoration:none;font-weight:700}
-footer .logo svg{width:30px;height:30px}
+footer .logo img{width:30px;height:30px;border-radius:8px}
 footer .logo b{font-size:19px}
 
 .toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;z-index:10;max-width:90vw;box-shadow:var(--shadow)}
@@ -264,7 +273,7 @@ footer .logo b{font-size:19px}
 <div class="hero">
   <div class="wrap">
     <nav class="top" aria-label="Ana menü">
-      <a class="logo" href="#" aria-label="Vakitbil ana sayfa"><svg aria-hidden="true"><use href="#logo"/></svg><b>Vakit<span>bil</span></b></a>
+      <a class="logo" href="#" aria-label="Vakitbil ana sayfa"><img src="img/logo.png" alt="" width="42" height="42"><b>Vakit<span>bil</span></b></a>
       <div class="links"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#sss">Sorular</a></div>
       <a class="btn primary" href="uygulama/" style="padding:10px 16px;font-size:14px">Hemen dene</a>
     </nav>
@@ -367,7 +376,7 @@ footer .logo b{font-size:19px}
 </div></section>
 
 <section id="fiyat" style="padding-top:0"><div class="wrap">
-  <div class="head"><h2>İlk ay bizden. Beğenirsen devam et.</h2><p>Bütün özellikler 1 ay boyunca ücretsiz. Deneme için kart bilgisi istenmez, deneme bitince otomatik ücret alınmaz.</p></div>
+  <div class="head"><img class="shield" src="img/shield.webp" alt="" width="860" height="500" loading="lazy"><h2>İlk ay bizden. Beğenirsen devam et.</h2><p>Bütün özellikler 1 ay boyunca ücretsiz. Deneme için kart bilgisi istenmez, deneme bitince otomatik ücret alınmaz.</p></div>
   <div class="plans">
     <div class="plan"><h3>Aylık</h3><div class="price">₺49,99 <small>/ ay</small></div><ul><li><svg><use href="#i-check"/></svg>Sınırsız belge ve ödeme</li><li><svg><use href="#i-check"/></svg>Fotoğraftan otomatik okuma</li><li><svg><use href="#i-check"/></svg>Bütün hatırlatmalar</li></ul><a class="btn soft" href="#indir">1 ay ücretsiz dene</a></div>
     <div class="plan best"><span class="badge">En avantajlısı</span><h3>Yıllık</h3><div class="price">₺399 <small>/ yıl</small></div><ul><li><svg><use href="#i-check"/></svg>Aylık ₺33'e denk gelir</li><li><svg><use href="#i-check"/></svg>Aylığa göre yaklaşık 4 ay bedava</li><li><svg><use href="#i-check"/></svg>Şifreli yedek ve yeni telefona taşıma</li></ul><a class="btn primary" href="#indir">1 ay ücretsiz dene</a></div>
@@ -397,7 +406,7 @@ footer .logo b{font-size:19px}
 </div></div>
 
 <footer><div class="wrap">
-  <a class="logo" href="#" aria-label="Vakitbil"><svg aria-hidden="true"><use href="#logo"/></svg><b>Vakit<span>bil</span></b></a>
+  <a class="logo" href="#" aria-label="Vakitbil"><img src="img/logo.png" alt="" width="30" height="30"><b>Vakit<span>bil</span></b></a>
   <nav aria-label="Yasal"><a href="yasal/gizlilik.html">Gizlilik</a><a href="yasal/kvkk.html">KVKK</a><a href="yasal/sartlar.html">Kullanım şartları</a><a href="mailto:destek@vakitbil.com">destek@vakitbil.com</a></nav>
   <span>© 2026 Vakitbil</span>
 </div></footer>

@@ -142,6 +142,11 @@ class _PaywallPageState extends State<PaywallPage> {
                     icon: Icon(Icons.close_rounded, color: C.muted),
                   ),
                 ),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(24),
+                  child: AspectRatio(aspectRatio: 1032 / 600, child: Image.asset('assets/img/paywall.jpg', fit: BoxFit.cover)),
+                ),
+                const SizedBox(height: 14),
                 Container(
                   padding: const EdgeInsets.all(22),
                   decoration: BoxDecoration(
@@ -209,7 +214,7 @@ class _PaywallPageState extends State<PaywallPage> {
           child: Padding(
             padding: const EdgeInsets.all(28),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
-              IconBox(icon: Icons.workspace_premium_rounded, color: C.accent, size: 72),
+              ClipRRect(borderRadius: BorderRadius.circular(22), child: Image.asset('assets/img/paywall.jpg', width: 300)),
               const SizedBox(height: 18),
               Text('Aboneliğin aktif', style: display(30)),
               const SizedBox(height: 10),

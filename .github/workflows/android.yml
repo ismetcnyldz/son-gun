@@ -101,6 +101,7 @@ jobs:
           cp -r build/web build/site/uygulama
           cp -r site/yasal build/site/yasal
           cp assets/icon/icon.png build/site/icon.png
+          cp -r site/tanitim/img build/site/img
           echo "vakitbil.com" > build/site/CNAME
 
       - uses: actions/setup-python@v5
