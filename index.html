@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vakitbil</title>
+<meta name="description" content="Sigorta, muayene, garanti, kart ödemesi… Fotoğrafını çek, Vakitbil son günü okusun ve zamanı gelince hatırlatsın.">
+<meta property="og:title" content="Vakitbil: Son günü sen unut, Vakitbil hatırlatır.">
+<meta property="og:description" content="Belgelerin, garantilerin ve ödemelerin son günü tek yerde.">
+<meta property="og:image" content="icon.png">
+<link rel="icon" href="img/logo.png">
+<link rel="apple-touch-icon" href="img/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/*
+  Vakitbil tanıtım sayfası.
+  Fikir: evlerdeki koparmalı duvar takvimi. Her son tarih renkli bir takvim yaprağı;
+  kategoriler kendi rengini taşır (kart mercan, araç amber, garanti nane, belge çivit, abonelik pembe, çek gök mavisi).
+  Zemin serin ve sakin; renk yalnızca yapraklarda, ikonlarda ve bilgide.
+*/
+:root{
+  --bg:#F6F8FB; --surface:#FFFFFF; --surface2:#EEF2F7; --ink:#0F2430; --muted:#566673; --line:#E1E7EF;
+  --brand:#1E5E66; --brand2:#123F45; --brandSoft:#DDEEEE;
+  --coral:#FF6A4D; --amber:#F4A21E; --mint:#14B08F; --indigo:#5A5CE8; --pink:#E9488A; --sky:#2B96E8;
+  --display:"Bricolage Grotesque","Avenir Next","Segoe UI",system-ui,sans-serif;
+  --body:"Manrope","Segoe UI",system-ui,sans-serif;
+  --shadow:0 1px 2px rgba(15,36,48,.06),0 12px 32px -12px rgba(15,36,48,.18);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0E1A21; --surface:#15242C; --surface2:#1C2E37; --ink:#E9F0F3; --muted:#9BB0BA; --line:#263B45;
+  --brand:#6FC3C9; --brand2:#1E5E66; --brandSoft:#18363B; --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -14px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0E1A21; --surface:#15242C; --surface2:#1C2E37; --ink:#E9F0F3; --muted:#9BB0BA; --line:#263B45;
+  --brand:#6FC3C9; --brand2:#1E5E66; --brandSoft:#18363B; --shadow:0 1px 2px rgba(0,0,0,.3),0 16px 36px -14px rgba(0,0,0,.6); color-scheme:dark}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 var(--body);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img{max-width:100%;display:block}
+a{color:inherit}
+.wrap{max-width:1160px;margin:0 auto;padding-inline:max(20px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:var(--display);font-weight:800;letter-spacing:-.025em;line-height:1.02;margin:0;text-wrap:balance}
+p{margin:0}
+:focus-visible{outline:3px solid var(--sky);outline-offset:3px;border-radius:8px}
+
+/* buttons */
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:16px;padding:13px 20px;font:800 15px var(--body);text-decoration:none;border:1.5px solid transparent;cursor:pointer;transition:transform .15s ease}
+.btn:active{transform:scale(.98)}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.soft{background:var(--surface);border-color:var(--line);color:var(--ink)}
+.btn svg{width:22px;height:22px;flex:none}
+.btn .lab{display:flex;flex-direction:column;line-height:1.1;text-align:left}
+.btn .lab small{font-size:11px;font-weight:600;opacity:.7}
+
+/* logo */
+.logo{display:flex;align-items:center;gap:11px;text-decoration:none}
+.logo img{width:42px;height:42px;flex:none;border-radius:11px;box-shadow:0 6px 14px -4px rgba(18,63,69,.4)}
+.logo b{font:800 25px var(--display);letter-spacing:-.03em}
+.logo b span{color:var(--coral)}
+
+/* nav */
+nav.top{display:flex;align-items:center;justify-content:space-between;gap:16px;padding-block:20px}
+nav.top .links{display:flex;gap:26px;font-weight:700;font-size:14.5px}
+nav.top .links a{text-decoration:none;color:var(--muted)}
+nav.top .links a:hover{color:var(--ink)}
+@media(max-width:820px){nav.top .links{display:none}}
+
+/* hero */
+.hero{position:relative;isolation:isolate;overflow-x:clip}
+.hero::before{content:"";position:absolute;inset:-120px -10vw auto;height:900px;z-index:-1;-webkit-mask-image:linear-gradient(#000 70%,transparent);mask-image:linear-gradient(#000 70%,transparent);
+  background:
+    radial-gradient(420px 320px at 78% 30%,color-mix(in srgb,var(--coral) 26%,transparent),transparent 70%),
+    radial-gradient(380px 300px at 92% 70%,color-mix(in srgb,var(--indigo) 22%,transparent),transparent 70%),
+    radial-gradient(420px 340px at 58% 78%,color-mix(in srgb,var(--mint) 22%,transparent),transparent 70%),
+    radial-gradient(360px 260px at 12% 10%,color-mix(in srgb,var(--amber) 16%,transparent),transparent 70%),
+    var(--herobg) center 20%/cover no-repeat}
+.hero::before{opacity:.9}
+:root{--herobg:url(img/hero-bg.webp)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--herobg:none}}
+:root[data-theme="dark"]{--herobg:none}
+.hero .grid{display:grid;grid-template-columns:1.02fr .98fr;gap:36px;align-items:center;padding-block:28px 70px}
+@media(max-width:940px){.hero .grid{grid-template-columns:1fr;padding-bottom:40px}}
+.hero h1{font-size:clamp(44px,6.6vw,84px)}
+.lead{font-size:clamp(17px,1.6vw,20px);color:var(--muted);max-width:36ch;margin:22px 0 30px}
+.ctas{display:flex;gap:10px;flex-wrap:wrap}
+.ticks{display:flex;gap:10px 18px;flex-wrap:wrap;margin-top:26px;font-size:14px;font-weight:700;color:var(--muted)}
+.ticks span{display:flex;align-items:center;gap:7px}
+.ticks i{width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--c);flex:none}
+.ticks i svg{width:12px;height:12px;fill:#fff}
+
+/* hero stage: phone + calendar leaves */
+.stage{position:relative;height:640px}
+@media(max-width:940px){.stage{height:600px;max-width:460px;margin-inline:auto;width:100%}}
+@media(max-width:480px){.stage{height:540px}}
+.phone{--ry:-18deg;--rx:7deg;--rz:-2deg;position:absolute;left:50%;top:10px;transform:translateX(-50%) perspective(1500px) rotateY(var(--ry)) rotateX(var(--rx)) rotateZ(var(--rz));transform-style:preserve-3d;transition:transform .6s cubic-bezier(.2,.7,.2,1);width:280px;aspect-ratio:1290/2796;border-radius:48px;padding:11px;
+ background:linear-gradient(140deg,#56676d 0%,#18232700 18%),linear-gradient(320deg,#4a5b61 0%,#18232700 16%),linear-gradient(160deg,#1c282c,#0a1114 55%,#16211f);
+ box-shadow:inset 0 0 0 1.5px rgba(255,255,255,.22),inset 0 0 0 3px #04080a,inset 0 0 0 6px #121b1e,40px 60px 70px -34px rgba(15,36,48,.55),90px 110px 140px -60px rgba(30,94,102,.5)}
+.phone::before{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,#05090b,#2f3d42 60%,#0d1417);transform:translateZ(-18px);box-shadow:0 0 0 1px rgba(0,0,0,.4)}
+.phone::after{content:"";position:absolute;right:-3px;top:21%;width:4px;height:58px;border-radius:0 3px 3px 0;background:linear-gradient(#5c6d73,#1b2528);box-shadow:0 74px 0 0 #2c393d}
+.phone:hover{--ry:-8deg;--rx:3deg}
+.phone img{position:relative;width:100%;height:100%;object-fit:cover;object-position:top;border-radius:37px;background:#F3F1EC}
+.phone .hw{position:absolute;inset:11px;border-radius:37px;pointer-events:none;background:linear-gradient(112deg,rgba(255,255,255,.30) 0%,rgba(255,255,255,.07) 26%,transparent 42%,transparent 78%,rgba(255,255,255,.08) 100%)}
+.phone .hw::after{content:"";position:absolute;top:13px;left:50%;width:11px;height:11px;margin-left:-5.5px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#2a4a66 0 18%,#04070a 40%);box-shadow:0 0 0 2px #0b1215}
+@media(max-width:480px){.phone{width:236px;--ry:-10deg;--rx:4deg}}
+@media(prefers-reduced-motion:reduce){.phone{transition:none}}
+.leaf{position:absolute;width:168px;background:var(--surface);border-radius:20px;box-shadow:var(--shadow);overflow:hidden;z-index:2}
+.leaf .band{height:30px;background:var(--c);display:flex;align-items:center;justify-content:center;gap:28px}
+.leaf .band i{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.75)}
+.leaf .body{padding:10px 14px 14px;display:grid;grid-template-columns:auto 1fr;gap:2px 10px;align-items:center}
+.leaf .num{font:800 46px/1 var(--display);color:var(--c);grid-row:span 2;letter-spacing:-.04em}
+.leaf .what{font-weight:800;font-size:13.5px;line-height:1.2}
+.leaf .when{font-size:11.5px;color:var(--muted);font-weight:600}
+.leaf.l1{--c:var(--coral);left:-40px;top:96px;transform:rotate(-7deg)}
+.leaf.l2{--c:var(--amber);right:-36px;top:200px;transform:rotate(6deg)}
+.leaf.l3{--c:var(--mint);left:-28px;bottom:150px;transform:rotate(4deg)}
+.leaf.l4{--c:var(--indigo);right:-30px;bottom:60px;transform:rotate(-5deg)}
+@media(max-width:940px){.leaf.l1{left:-8px}.leaf.l2{right:-8px}.leaf.l3{left:-4px}.leaf.l4{right:-4px}}
+@media(max-width:480px){.leaf{width:128px;border-radius:16px}.leaf .band{height:22px}.leaf .body{padding:8px 10px 10px;gap:0 8px}.leaf .num{font-size:32px}.leaf .what{font-size:12px}.leaf .when{font-size:10.5px}.leaf.l1{left:-12px;top:70px}.leaf.l2{right:-12px;top:170px}.leaf.l3{left:-10px;bottom:130px}.leaf.l4{right:-10px;bottom:40px}}
+@media (prefers-reduced-motion:no-preference){
+  .leaf{animation:drop .7s cubic-bezier(.2,.8,.2,1.15) both}
+  .leaf.l1{animation-delay:.15s}.leaf.l2{animation-delay:.3s}.leaf.l3{animation-delay:.45s}.leaf.l4{animation-delay:.6s}
+  @keyframes drop{from{opacity:0;translate:0 -26px;scale:.94}}
+}
+
+/* category ribbon */
+.ribbon{background:var(--surface);border-block:1px solid var(--line)}
+.ribbon .wrap{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;padding-block:22px}
+.chip{display:inline-flex;align-items:center;gap:8px;padding:7px 14px 7px 7px;border-radius:99px;background:var(--surface2);font-weight:700;font-size:14px}
+.chip i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--c)}
+.chip i svg{width:15px;height:15px;fill:#fff}
+
+section{padding-block:96px}
+@media(max-width:720px){section{padding-block:64px}}
+.head{max-width:680px;margin-bottom:44px}
+.head h2{font-size:clamp(34px,4.6vw,56px)}
+.head p{color:var(--muted);font-size:18px;margin-top:16px;max-width:52ch}
+
+/* steps (a real sequence) */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;counter-reset:s}
+@media(max-width:860px){.steps{grid-template-columns:1fr}}
+.step{position:relative;padding:28px;border-radius:26px;background:var(--surface);border:1px solid var(--line)}
+.step .n{width:54px;height:54px;border-radius:18px;display:grid;place-items:center;background:var(--c);color:#fff;font:800 26px var(--display);margin-bottom:18px;box-shadow:0 10px 20px -10px var(--c)}
+.step h3{font-size:25px;margin-bottom:8px}
+.step p{color:var(--muted)}
+
+/* bento features */
+.bento{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.tile{border-radius:26px;padding:26px;background:var(--surface);border:1px solid var(--line);position:relative;overflow:hidden}
+.tile .ic{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:linear-gradient(135deg,var(--c),color-mix(in srgb,var(--c) 70%,#000));box-shadow:0 12px 22px -12px var(--c);margin-bottom:18px}
+.tile .ic svg{width:26px;height:26px;fill:#fff}
+.tile h3{font-size:24px;margin-bottom:8px}
+.tile p{color:var(--muted);font-size:15.5px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:14px}
+.tags span{font-size:12.5px;font-weight:700;padding:4px 11px;border-radius:99px;background:color-mix(in srgb,var(--c) 13%,transparent);color:color-mix(in srgb,var(--c) 75%,var(--ink))}
+.t-scan{grid-column:span 4;grid-row:span 2;display:grid;grid-template-columns:1fr 210px;gap:20px;align-items:end;background:linear-gradient(150deg,color-mix(in srgb,var(--indigo) 14%,var(--surface)),var(--surface) 60%)}
+.t-scan .shot{align-self:end;margin-bottom:-26px;border-radius:26px 26px 0 0;overflow:hidden;box-shadow:var(--shadow);border:6px solid #0B1418;border-bottom:0;aspect-ratio:1290/1900}
+.t-scan .shot img{width:100%;height:100%;object-fit:cover;object-position:top}
+.t-scan h3{font-size:clamp(28px,3vw,38px)}
+.t-sm{grid-column:span 2}
+.t-md{grid-column:span 3}
+@media(max-width:940px){.bento{grid-template-columns:repeat(2,1fr)}.t-scan{grid-column:span 2;grid-row:auto}.t-sm,.t-md{grid-column:span 1}}
+@media(max-width:600px){.bento{grid-template-columns:1fr}.t-scan,.t-sm,.t-md{grid-column:auto}.t-scan{grid-template-columns:1fr}.t-scan .shot{max-width:230px;margin-inline:auto}}
+
+/* sms spotlight */
+.spot{display:grid;grid-template-columns:.9fr 1.1fr;gap:56px;align-items:center}
+@media(max-width:900px){.spot{grid-template-columns:1fr}}
+.spot .phone{--ry:18deg;--rz:2deg;position:relative;left:auto;top:auto;transform:perspective(1500px) rotateY(var(--ry)) rotateX(var(--rx)) rotateZ(var(--rz));margin-inline:auto;width:270px}
+.spot .phone:hover{--ry:8deg}
+.spot .phone::after{right:auto;left:-3px;border-radius:3px 0 0 3px}
+.spot h2{font-size:clamp(34px,4.4vw,52px)}
+.spot p.sub{color:var(--muted);font-size:18px;margin-top:16px}
+.flags{list-style:none;padding:0;margin:26px 0 0;display:grid;gap:10px}
+.flags li{display:flex;gap:12px;align-items:center;padding:12px 16px;border-radius:16px;background:var(--surface);border:1px solid var(--line);font-weight:700}
+.flags li i{width:30px;height:30px;border-radius:10px;background:color-mix(in srgb,var(--coral) 15%,transparent);display:grid;place-items:center;flex:none}
+.flags li i svg{width:16px;height:16px;fill:var(--coral)}
+
+/* privacy */
+.privacy{border-radius:34px;padding:clamp(30px,5vw,60px);background:linear-gradient(135deg,#1E5E66,#0F3439 70%);color:#EAF4F4;display:grid;grid-template-columns:1.05fr .95fr;gap:36px;align-items:center;position:relative;overflow:hidden;isolation:isolate}
+.privacy::after{content:"";position:absolute;width:420px;height:420px;right:-120px;top:-160px;border-radius:50%;background:radial-gradient(closest-side,rgba(20,176,143,.45),transparent);z-index:-1}
+@media(max-width:860px){.privacy{grid-template-columns:1fr}}
+.privacy h2{font-size:clamp(32px,4.2vw,50px);color:#fff}
+.privacy p{color:rgba(234,244,244,.82);margin-top:14px;font-size:17px}
+.privacy ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.privacy li{display:flex;gap:12px;align-items:center;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);border-radius:16px;padding:13px 16px;font-weight:700}
+.privacy li i{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;background:var(--c);flex:none}
+.privacy li i svg{width:16px;height:16px;fill:#fff}
+
+/* pricing */
+.shield{display:block;width:min(320px,80%);height:auto;margin:0 0 0 -30px;mix-blend-mode:multiply;-webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent);mask-image:radial-gradient(closest-side,#000 62%,transparent)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .shield{display:none}}
+:root[data-theme="dark"] .shield{display:none}
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;align-items:stretch}
+@media(max-width:900px){.plans{grid-template-columns:1fr}}
+.plan{border-radius:28px;padding:30px;background:var(--surface);border:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.plan h3{font-size:26px}
+.price{font:800 46px/1 var(--display);letter-spacing:-.03em}
+.price small{font:700 15px var(--body);color:var(--muted);letter-spacing:0}
+.plan ul{margin:0;padding:0;list-style:none;display:grid;gap:9px;color:var(--muted);font-size:15.5px}
+.plan li{display:flex;gap:10px;align-items:flex-start}
+.plan li svg{width:18px;height:18px;fill:var(--mint);flex:none;margin-top:3px}
+.plan .btn{justify-content:center;margin-top:auto}
+.plan.best{background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(135deg,var(--coral),var(--amber),var(--mint),var(--indigo)) border-box;border:2.5px solid transparent;box-shadow:var(--shadow)}
+.badge{align-self:flex-start;font-size:12.5px;font-weight:800;padding:5px 12px;border-radius:99px;background:linear-gradient(90deg,var(--coral),var(--amber));color:#fff}
+.note{font-size:14px;color:var(--muted);margin-top:18px}
+
+/* faq */
+.faq{max-width:800px}
+details{border-bottom:1px solid var(--line);padding-block:20px}
+summary{cursor:pointer;font-weight:800;font-size:18px;list-style:none;display:flex;justify-content:space-between;align-items:center;gap:16px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"";width:30px;height:30px;flex:none;border-radius:50%;background:var(--surface2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23566673'%3E%3Cpath d='M11 5h2v14h-2zM5 11h14v2H5z'/%3E%3C/svg%3E") center/16px no-repeat;transition:transform .2s ease}
+details[open] summary::after{transform:rotate(45deg)}
+details p{color:var(--muted);margin-top:12px;max-width:66ch}
+
+/* final */
+.final{border-radius:34px;padding:clamp(40px,7vw,84px) 24px;text-align:center;position:relative;overflow:hidden;isolation:isolate;background:var(--ink);color:var(--bg);margin-bottom:64px}
+.final::before{content:"";position:absolute;inset:0;z-index:-1;opacity:.55;
+  background:radial-gradient(300px 220px at 15% 20%,var(--coral),transparent 70%),radial-gradient(300px 240px at 85% 25%,var(--indigo),transparent 70%),radial-gradient(340px 240px at 60% 110%,var(--mint),transparent 70%)}
+.final h2{font-size:clamp(38px,6vw,72px);max-width:15ch;margin:0 auto}
+.final p{opacity:.85;font-size:18px;margin:18px auto 30px;max-width:44ch}
+.final .ctas{justify-content:center}
+.final .btn{background:#fff;color:#0F2430}
+
+footer{border-top:1px solid var(--line);padding-block:30px;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+footer nav{display:flex;gap:18px;flex-wrap:wrap}
+footer a{text-decoration:none;font-weight:700}
+footer .logo img{width:30px;height:30px;border-radius:8px}
+footer .logo b{font-size:19px}
+
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:14px;font-weight:700;font-size:14px;z-index:10;max-width:90vw;box-shadow:var(--shadow)}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="lg-bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2F6E76"/><stop offset="1" stop-color="#123F45"/></linearGradient>
+    <linearGradient id="lg-band" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FF8A6B"/><stop offset="1" stop-color="#F0563A"/></linearGradient>
+    <linearGradient id="lg-alert" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#F0563A"/><stop offset="1" stop-color="#C23A26"/></linearGradient>
+  </defs>
+  <!-- Logo: uygulama simgesiyle aynı takvim + uyarı rozeti -->
+  <symbol id="logo" viewBox="0 0 64 64">
+    <rect width="64" height="64" rx="16" fill="url(#lg-bg)"/>
+    <rect x="12" y="17" width="34" height="33" rx="6" fill="#FBF7EC"/>
+    <path d="M18 17h22a6 6 0 0 1 6 6v3H12v-3a6 6 0 0 1 6-6z" fill="url(#lg-band)"/>
+    <rect x="19" y="13" width="3.4" height="8" rx="1.7" fill="#1A2B31"/><rect x="35.6" y="13" width="3.4" height="8" rx="1.7" fill="#1A2B31"/>
+    <g fill="#D9D2C3"><circle cx="19" cy="33" r="2"/><circle cx="25.5" cy="33" r="2"/><circle cx="32" cy="33" r="2"/><circle cx="19" cy="40" r="2"/><circle cx="25.5" cy="40" r="2"/></g>
+    <circle cx="44" cy="44" r="10" fill="url(#lg-alert)" stroke="#123F45" stroke-width="2.4"/>
+    <rect x="42.6" y="37.6" width="2.8" height="8" rx="1.4" fill="#fff"/><circle cx="44" cy="49.2" r="1.6" fill="#fff"/>
+    <g stroke="#FFC9B8" stroke-width="2.2" stroke-linecap="round"><path d="M55.5 34.5l2.5-2.5"/><path d="M57 44h3.5"/><path d="M55.5 53.5l2.5 2.5"/></g>
+  </symbol>
+  <symbol id="i-car" viewBox="0 0 24 24"><path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11v7a1 1 0 0 1-1 1h-1a1 1 0 0 1-1-1v-1H8v1a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-7zm2.2-1h9.6l-1-3H8.2l-1 3zM7.5 15a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm9 0a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3z"/></symbol>
+  <symbol id="i-card" viewBox="0 0 24 24"><path d="M3 6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6zm2 2v2h14V8H5zm0 5v5h14v-5H5zm2 2h5v2H7v-2z"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 3v6c0 5-3.4 9.4-8 11-4.6-1.6-8-6-8-11V5l8-3zm-1 13.6l5.7-5.7-1.4-1.4L11 12.8 8.7 10.5l-1.4 1.4 3.7 3.7z"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 1 0 20 10 10 0 0 1 0-20zm-2 6v8l6-4-6-4z"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M7 2h10a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zm0 3v13h10V5H7zm4 14v1h2v-1h-2z"/></symbol>
+  <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 4h5v2H6v3H4V4zm11 0h5v5h-2V6h-3V4zM4 15h2v3h3v2H4v-5zm14 0h2v5h-5v-2h3v-3zM7 11h10v2H7v-2z"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2zm7-6V11a7 7 0 0 0-5.5-6.8V3a1.5 1.5 0 0 0-3 0v1.2A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2z"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M12 3l9 8h-3v9h-5v-6h-2v6H6v-9H3l9-8z"/></symbol>
+  <symbol id="i-repeat" viewBox="0 0 24 24"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></symbol>
+  <symbol id="i-cheque" viewBox="0 0 24 24"><path d="M3 6h18v12H3V6zm2 2v8h14V8H5zm2 2h6v2H7v-2zm0 3h4v1.5H7V13zm8 0h3v1.5h-3V13z"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><path d="M7 10V7a5 5 0 0 1 10 0v3h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h1zm2 0h6V7a3 3 0 0 0-6 0v3z"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M9 16.2l-3.5-3.5L4 14.2l5 5 11-11-1.4-1.4z"/></symbol>
+  <symbol id="i-pass" viewBox="0 0 24 24"><path d="M6 2h11a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H6V2zm6 5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7zM9 17v1.5h6V17H9z"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M12 2L1 21h22L12 2zm-1 7h2v6h-2V9zm0 8h2v2h-2v-2z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><path d="M7 2h2v2h6V2h2v2h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2V2zM5 9v11h14V9H5zm2 2h4v4H7v-4z"/></symbol>
+  <symbol id="i-gift" viewBox="0 0 24 24"><path d="M20 7h-2.2A3 3 0 0 0 12 4.6 3 3 0 0 0 6.2 7H4v5h1v9h14v-9h1V7zm-6-1a1 1 0 1 1 1 1h-2a1 1 0 0 1 1-1zM9 6a1 1 0 0 1 1 1H8a1 1 0 0 1 1-1zm2 13H7v-7h4v7zm0-9H6V9h5v1zm6 9h-4v-7h4v7zm1-9h-5V9h5v1z"/></symbol>
+</svg>
+
+<div class="hero">
+  <div class="wrap">
+    <nav class="top" aria-label="Ana menü">
+      <a class="logo" href="#" aria-label="Vakitbil ana sayfa"><img src="img/logo.png" alt="" width="42" height="42"><b>Vakit<span>bil</span></b></a>
+      <div class="links"><a href="#nasil">Nasıl çalışır</a><a href="#ozellikler">Özellikler</a><a href="#fiyat">Fiyat</a><a href="#sss">Sorular</a></div>
+      <a class="btn primary" href="uygulama/" style="padding:10px 16px;font-size:14px">Hemen dene</a>
+    </nav>
+
+    <header class="grid">
+      <div>
+        <h1>Son günü sen unut, Vakitbil hatırlatır.</h1>
+        <p class="lead">Trafik sigortası, muayene, DASK, pasaport, garanti, kart son ödeme günü. Fotoğrafını çek; Vakitbil tarihi okur, zamanı gelince seni uyarır.</p>
+        <div class="ctas" id="indir">
+          <a class="btn primary" href="#" data-soon><svg fill="currentColor"><use href="#i-phone"/></svg><span class="lab"><small>Çok yakında</small>App Store</span></a>
+          <a class="btn primary" href="#" data-soon><svg fill="currentColor"><use href="#i-play"/></svg><span class="lab"><small>Çok yakında</small>Google Play</span></a>
+          <a class="btn soft" href="uygulama/">Tarayıcıda dene</a>
+        </div>
+        <div class="ticks">
+          <span><i style="--c:var(--mint)"><svg><use href="#i-check"/></svg></i>1 ay ücretsiz</span>
+          <span><i style="--c:var(--sky)"><svg><use href="#i-check"/></svg></i>Reklamsız</span>
+          <span><i style="--c:var(--indigo)"><svg><use href="#i-check"/></svg></i>Kart numarası istemez</span>
+          <span><i style="--c:var(--coral)"><svg><use href="#i-check"/></svg></i>Bilgiler telefonunda</span>
+        </div>
+      </div>
+
+      <div class="stage" aria-label="Vakitbil ana ekranı ve yaklaşan son tarihler">
+        <div class="phone"><img src="shots/light-home.png" alt="Vakitbil ana ekranı: yaklaşan son tarihler" width="1290" height="2796"><i class="hw"></i></div>
+        <div class="leaf l1" aria-hidden="true"><div class="band"><i></i><i></i></div><div class="body"><span class="num">3</span><span class="what">Kart son ödeme</span><span class="when">gün kaldı</span></div></div>
+        <div class="leaf l2" aria-hidden="true"><div class="band"><i></i><i></i></div><div class="body"><span class="num">18</span><span class="what">Araç muayenesi</span><span class="when">gün kaldı</span></div></div>
+        <div class="leaf l3" aria-hidden="true"><div class="band"><i></i><i></i></div><div class="body"><span class="num">46</span><span class="what">Telefon garantisi</span><span class="when">gün kaldı</span></div></div>
+        <div class="leaf l4" aria-hidden="true"><div class="band"><i></i><i></i></div><div class="body"><span class="num">72</span><span class="what">Pasaport</span><span class="when">gün kaldı</span></div></div>
+      </div>
+    </header>
+  </div>
+</div>
+
+<div class="ribbon" aria-label="Takip edebileceklerin">
+  <div class="wrap">
+    <span class="chip"><i style="--c:var(--amber)"><svg><use href="#i-car"/></svg></i>Trafik sigortası</span>
+    <span class="chip"><i style="--c:var(--amber)"><svg><use href="#i-car"/></svg></i>Kasko ve muayene</span>
+    <span class="chip"><i style="--c:var(--indigo)"><svg><use href="#i-home"/></svg></i>DASK</span>
+    <span class="chip"><i style="--c:var(--indigo)"><svg><use href="#i-pass"/></svg></i>Pasaport ve ehliyet</span>
+    <span class="chip"><i style="--c:var(--mint)"><svg><use href="#i-shield"/></svg></i>Garantiler</span>
+    <span class="chip"><i style="--c:var(--coral)"><svg><use href="#i-card"/></svg></i>Kredi kartı</span>
+    <span class="chip"><i style="--c:var(--pink)"><svg><use href="#i-repeat"/></svg></i>Abonelikler</span>
+    <span class="chip"><i style="--c:var(--sky)"><svg><use href="#i-cheque"/></svg></i>Çek ve senet</span>
+  </div>
+</div>
+
+<section id="nasil"><div class="wrap">
+  <div class="head"><h2>Üç adımda kur, sonra aklından çıkar.</h2></div>
+  <div class="steps">
+    <div class="step" style="--c:var(--coral)"><div class="n">1</div><h3>Fotoğrafını çek</h3><p>Poliçe, ekstre, garanti belgesi ya da fatura. İstersen tarihi elle de yazabilirsin.</p></div>
+    <div class="step" style="--c:var(--amber)"><div class="n">2</div><h3>Tarih kendiliğinden okunur</h3><p>Vakitbil belgenin türünü ve son tarihini telefonunun içinde, internete göndermeden okur.</p></div>
+    <div class="step" style="--c:var(--mint)"><div class="n">3</div><h3>Zamanı gelince hatırlatır</h3><p>30, 7 ve 1 gün kala, son gün sabahı bildirim gelir. Saatini sen seçersin.</p></div>
+  </div>
+</div></section>
+
+<section id="ozellikler" style="padding-top:0"><div class="wrap">
+  <div class="head"><h2>Hayatındaki bütün son tarihler tek yerde.</h2><p>Türkiye için hazırlandı: muayene, MTV, emlak vergisi ve DASK tarihleri hazır geliyor.</p></div>
+  <div class="bento">
+    <div class="tile t-scan" style="--c:var(--indigo)">
+      <div>
+        <div class="ic"><svg><use href="#i-scan"/></svg></div>
+        <h3>Fotoğrafını çek, tarihi Vakitbil okusun.</h3>
+        <p style="margin-top:10px">Poliçedeki bitiş tarihi, ekstredeki son ödeme günü, garanti belgesindeki satış tarihi. Okuma telefonda yapılır; belgen hiçbir yere gönderilmez.</p>
+        <div class="tags"><span>Poliçe</span><span>Ekstre</span><span>Garanti belgesi</span><span>Fatura</span></div>
+      </div>
+      <div class="shot"><img src="shots/light-editor.png" alt="Yeni kayıt ekranı" loading="lazy" width="1290" height="2796"></div>
+    </div>
+    <div class="tile t-sm" style="--c:var(--amber)"><div class="ic"><svg><use href="#i-car"/></svg></div><h3>Araç</h3><p>Trafik sigortası, kasko, muayene ve MTV taksitleri.</p></div>
+    <div class="tile t-sm" style="--c:var(--coral)"><div class="ic"><svg><use href="#i-card"/></svg></div><h3>Kart son ödeme</h3><p>Her kartın son ödeme günü ve tutarı. Gecikme faizine son.</p></div>
+    <div class="tile t-md" style="--c:var(--mint)"><div class="ic"><svg><use href="#i-shield"/></svg></div><h3>Garantiler</h3><p>Fatura ve garanti belgesi fotoğrafıyla saklanır. Ürün bozulduğunda belge elinin altında.</p><div class="tags"><span>Telefon</span><span>Beyaz eşya</span><span>Elektronik</span></div></div>
+    <div class="tile t-md" style="--c:var(--indigo)"><div class="ic"><svg><use href="#i-pass"/></svg></div><h3>Ev ve kimlik</h3><p>DASK, konut sigortası, kira sözleşmesi, pasaport ve ehliyet yenileme.</p><div class="tags"><span>DASK</span><span>Pasaport</span><span>Ehliyet</span></div></div>
+    <div class="tile t-sm" style="--c:var(--pink)"><div class="ic"><svg><use href="#i-repeat"/></svg></div><h3>Abonelikler</h3><p>Aylık ne ödediğini gör, iptal sayfasına tek dokunuşla git.</p></div>
+    <div class="tile t-sm" style="--c:var(--sky)"><div class="ic"><svg><use href="#i-cheque"/></svg></div><h3>Çek ve senet</h3><p>Vadesi 7, 3 ve 1 gün kala hatırlatılır.</p></div>
+    <div class="tile t-sm" style="--c:var(--brand)"><div class="ic"><svg><use href="#i-cal"/></svg></div><h3>Türkiye takvimi</h3><p>Plakanı gir; muayene ve MTV tarihleri kendiliğinden eklensin.</p></div>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap spot">
+  <div class="phone"><img src="shots/dark-sms.png" alt="Sahte SMS kontrol ekranı" loading="lazy" width="1290" height="2796"><i class="hw"></i></div>
+  <div>
+    <h2>Sahte mesajı linke tıklamadan yakala.</h2>
+    <p class="sub">"İcra takibi başlatıldı", "kargonuz bekliyor", "ödül kazandınız"… Şüphelendiğin mesajı yapıştır; Vakitbil dolandırıcılık işaretlerini tek tek gösterir. Bu özellik herkese ücretsiz.</p>
+    <ul class="flags">
+      <li><i><svg><use href="#i-alert"/></svg></i>Link resmi bir adrese gitmiyor</li>
+      <li><i><svg><use href="#i-alert"/></svg></i>Korkutucu konu ve "24 saat" baskısı</li>
+      <li><i><svg><use href="#i-alert"/></svg></i>Senden ödeme ya da şifre istiyor</li>
+    </ul>
+  </div>
+</div></section>
+
+<section style="padding-top:0"><div class="wrap">
+  <div class="privacy">
+    <div><h2>Bilgilerin senin telefonunda kalır.</h2><p>Hesap açman gerekmez. Belgelerin bir sunucuya yüklenmez; fotoğraftan okuma telefonun içinde yapılır.</p></div>
+    <ul>
+      <li><i style="--c:var(--coral)"><svg><use href="#i-card"/></svg></i>Kart numarası, CVV ve şifre asla istenmez</li>
+      <li><i style="--c:var(--mint)"><svg><use href="#i-lock"/></svg></i>Yedek dosyan şifreyle kilitli (AES-256)</li>
+      <li><i style="--c:var(--amber)"><svg><use href="#i-shield"/></svg></i>Reklam yok, veri satışı yok</li>
+      <li><i style="--c:var(--indigo)"><svg><use href="#i-scan"/></svg></i>Yazı okuma internetsiz çalışır</li>
+    </ul>
+  </div>
+</div></section>
+
+<section id="fiyat" style="padding-top:0"><div class="wrap">
+  <div class="head"><img class="shield" src="img/shield.webp" alt="" width="860" height="500" loading="lazy"><h2>İlk ay bizden. Beğenirsen devam et.</h2><p>Bütün özellikler 1 ay boyunca ücretsiz. Deneme için kart bilgisi istenmez, deneme bitince otomatik ücret alınmaz.</p></div>
+  <div class="plans">
+    <div class="plan"><h3>Aylık</h3><div class="price">₺49,99 <small>/ ay</small></div><ul><li><svg><use href="#i-check"/></svg>Sınırsız belge ve ödeme</li><li><svg><use href="#i-check"/></svg>Fotoğraftan otomatik okuma</li><li><svg><use href="#i-check"/></svg>Bütün hatırlatmalar</li></ul><a class="btn soft" href="#indir">1 ay ücretsiz dene</a></div>
+    <div class="plan best"><span class="badge">En avantajlısı</span><h3>Yıllık</h3><div class="price">₺399 <small>/ yıl</small></div><ul><li><svg><use href="#i-check"/></svg>Aylık ₺33'e denk gelir</li><li><svg><use href="#i-check"/></svg>Aylığa göre yaklaşık 4 ay bedava</li><li><svg><use href="#i-check"/></svg>Şifreli yedek ve yeni telefona taşıma</li></ul><a class="btn primary" href="#indir">1 ay ücretsiz dene</a></div>
+    <div class="plan"><h3>Aile</h3><div class="price">₺599 <small>/ yıl</small></div><ul><li><svg><use href="#i-check"/></svg>5 kişiye kadar</li><li><svg><use href="#i-check"/></svg>Ortak aile kayıtları</li><li><svg><use href="#i-check"/></svg>Eşinin ve ebeveynlerinin hatırlatmaları</li></ul><a class="btn soft" href="#indir">Yakında</a></div>
+  </div>
+  <p class="note">Sahte SMS kontrolü herkese her zaman ücretsiz. Fiyatlar yayın öncesi değişebilir.</p>
+</div></section>
+
+<section id="sss" style="padding-top:0"><div class="wrap faq">
+  <div class="head"><h2>Merak edilenler</h2></div>
+  <details><summary>Belgelerim nerede saklanıyor?</summary><p>Sadece senin telefonunda. Vakitbil belgelerini bir sunucuya göndermez. Yedek alırsan kayıtların ve fotoğrafların senin şifrenle kilitli bir dosyaya yazılır; dosya yine sende kalır.</p></details>
+  <details><summary>Kart bilgilerimi istiyor mu?</summary><p>Hayır. Sadece bankanın adını ve son ödeme gününü kaydedersin. Kart numarası, CVV ve şifre hiçbir zaman istenmez.</p></details>
+  <details><summary>Fotoğraftan okuma her belgede çalışır mı?</summary><p>Poliçe, ekstre, garanti belgesi ve faturaların çoğunda tarihi doğru okur. Okuyamazsa tarihi tek dokunuşla elle seçersin.</p></details>
+  <details><summary>Bildirimler ne zaman gelir?</summary><p>Belgelerde 30, 7 ve 1 gün kala ve son gün sabahı. Kart ve aboneliklerde 3 ve 1 gün kala, çek ve senetlerde 7, 3 ve 1 gün kala. Bildirim saatini ayarlardan sen seçersin.</p></details>
+  <details><summary>Deneme süresi bitince ne olur?</summary><p>Deneme için kart bilgisi istenmez, yani deneme bitince otomatik ücret alınmaz. Devam etmek istersen aylık ya da yıllık abone olursun. Abone olmasan da kayıtların silinmez.</p></details>
+  <details><summary>iPhone ve Android'de var mı?</summary><p>İkisinde de olacak. Mağazalarda yayına girene kadar tarayıcıda deneme sürümünü kullanabilirsin.</p></details>
+</div></section>
+
+<div class="wrap"><div class="final">
+  <h2>Bir daha hiçbir son günü kaçırma.</h2>
+  <p>İlk ay ücretsiz. Kurulum bir dakika, ilk belgen otuz saniye.</p>
+  <div class="ctas">
+    <a class="btn" href="#" data-soon><svg fill="currentColor"><use href="#i-phone"/></svg><span class="lab"><small>Çok yakında</small>App Store</span></a>
+    <a class="btn" href="#" data-soon><svg fill="currentColor"><use href="#i-play"/></svg><span class="lab"><small>Çok yakında</small>Google Play</span></a>
+    <a class="btn" href="uygulama/">Tarayıcıda dene</a>
+  </div>
+</div></div>
+
+<footer><div class="wrap">
+  <a class="logo" href="#" aria-label="Vakitbil"><img src="img/logo.png" alt="" width="30" height="30"><b>Vakit<span>bil</span></b></a>
+  <nav aria-label="Yasal"><a href="yasal/gizlilik.html">Gizlilik</a><a href="yasal/kvkk.html">KVKK</a><a href="yasal/sartlar.html">Kullanım şartları</a><a href="mailto:destek@vakitbil.com">destek@vakitbil.com</a></nav>
+  <span>© 2026 Vakitbil</span>
+</div></footer>
+
+<script>
+document.querySelectorAll('[data-soon]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();const t=document.createElement('div');t.className='toast';t.setAttribute('role','status');t.textContent='Mağazalarda çok yakında. Şimdilik tarayıcıda deneyebilirsin.';document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}));
+</script>
+</body>
+</html>
